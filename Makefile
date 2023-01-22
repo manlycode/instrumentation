@@ -116,6 +116,10 @@ init:             ## Initialize the project based on an application template.
 	@./.github/init.sh
 
 
+
+.PHONY: script
+script:
+	python -m instrumentation
 # This project has been generated from rochacbruno/python-project-template
 # __author__ = 'rochacbruno'
 # __repo__ = https://github.com/rochacbruno/python-project-template
