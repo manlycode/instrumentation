@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
-from pyvisa import ResourceManager
+
+from pyvisa.resources.usb import USBInstrument
 
 
 class BWLimit(Enum):
@@ -24,6 +25,7 @@ class Flag(Enum):
     ON = "ON"
     OFF = "OFF"
 
+    @staticmethod
     def fromBool(val: Optional[bool] = None):
         state = None
 
@@ -36,7 +38,7 @@ class Flag(Enum):
 class Channel:
     def __init__(self, number: int, resource) -> None:
         self.number = number
-        self.resource = resource
+        self.resource: USBInstrument = resource
         self.chanCmdRoot = f":CHAN{self.number}"
 
     def __dispatch_enum(self, cmdRoot: str, arg):
@@ -94,9 +96,9 @@ class Channel:
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
-        self.channels: list[Channel] = list(map(
-            lambda x: Channel(x, resource), numbers
-        ))
+        self.channels: list[Channel] = list(
+            map(lambda x: Channel(x, resource), numbers)
+        )
 
     def bwLimit(self, limit: Optional[BWLimit] = None) -> list[str]:
         return list(map(lambda x: x.bwLimit(limit), self.channels))
@@ -107,7 +109,7 @@ class ChannelList:
     def impedance(self, imp: Optional[Impedance] = None) -> list[str]:
         return list(map(lambda x: x.impedance(imp), self.channels))
 
-    def invert(self, inv: Optional[Flag] = None) -> list[str]:
+    def invert(self, inv: Optional[bool] = None) -> list[str]:
         return list(map(lambda x: x.invert(inv), self.channels))
 
     def label(self, state: Optional[bool] = None) -> list[str]:
@@ -118,11 +120,11 @@ class ChannelList:
 
 
 class Scope:
-    resourceID = "USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR"
+    RESOURCE_ID = "USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR"
 
-    def __init__(self, rm: ResourceManager) -> None:
-        self.rm = rm
-        self.resource = self.rm.open_resource(Scope.resourceID)
+    def __init__(self, resource: USBInstrument) -> None:
+        self.resource = resource
+        print(f"the Type{type(self.resource)}")
 
     def write(self, msg: str):
         self.resource.write(msg)

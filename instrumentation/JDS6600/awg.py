@@ -1,7 +1,6 @@
 from enum import IntEnum
 from typing import Optional
-
-from pyvisa import ResourceManager
+from pyvisa.resources.usb import USBInstrument
 
 
 class WaveForm(IntEnum):
@@ -32,28 +31,34 @@ class Freq:
     def __str__(self):
         return f"{self.value},{self.scale}"
 
+    @staticmethod
     def Hz(val: float):
         return Freq(int(val * 100), 0)
 
+    @staticmethod
     def kHz(val: float):
         return Freq(int(val * 10000), 1)
 
+    @staticmethod
     def MHz(val: float):
         return Freq(int(val * 100000000), 2)
 
+    @staticmethod
     def mHz(val: float):
         return Freq(int(val * 100), 3)
 
+    @staticmethod
     def uHz(val: float):
         return Freq(int(val * 100), 4)
 
 
 class Channel:
-    def __init__(self, number: int, resource) -> None:
+    def __init__(self, number: int, resource: USBInstrument) -> None:
         self.number = number
         self.resource = resource
 
-    def waveForm(self, wf: Optional[WaveForm] = None) -> str:
+    def waveForm(self, wf: Optional[WaveForm] = None) -> Optional[str]:
+
         cmdOffset = 0
         if wf is None:
             cmd = f":r2{self.number+cmdOffset}=."
@@ -63,9 +68,10 @@ class Channel:
         else:
             cmd = f":w2{self.number+cmdOffset}={wf.value}.\n"
             print(cmd)
-            return self.resource.write(cmd)
+            self.resource.write(cmd)
+            return None
 
-    def frequency(self, freq: Optional[Freq] = None) -> str:
+    def frequency(self, freq: Optional[Freq] = None) -> Optional[str]:
         cmdOffset = 2
         if freq is None:
             cmd = f":r2{self.number+cmdOffset}=."
@@ -75,30 +81,35 @@ class Channel:
         else:
             cmd = f":w2{self.number+cmdOffset}={freq}.\n"
             print(cmd)
-            return self.resource.write(cmd)
+            self.resource.write(cmd)
+            return None
 
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
-        self.channels: list[Channel] = map(
+        self.channels: list[Channel] = list(map(
             lambda x: Channel(x, resource), numbers
-        )
+        ))
 
-    def waveForm(self, limit: Optional[WaveForm] = None) -> list[str]:
+    def waveForm(
+        self,
+        limit: Optional[WaveForm] = None
+    ) -> list[Optional[str]]:
         return list(map(lambda x: x.waveForm(limit), self.channels))
 
-    def frequency(self, limit: Optional[WaveForm] = None) -> list[str]:
+    def frequency(
+        self,
+        limit: Optional[Freq] = None
+    ) -> list[Optional[str]]:
         return list(map(lambda x: x.frequency(limit), self.channels))
 
 
 class AWG:
-    resourceID = "ASRL1::INSTR"
-    baudRate = 115200
+    RESOURCE_ID = "ASRL1::INSTR"
+    BAUD_RATE = 115200
 
-    def __init__(self, rm: ResourceManager) -> None:
-        self.rm = rm
-        self.resource = self.rm.open_resource(AWG.resourceID)
-        self.resource.baud_rate = 115200
+    def __init__(self, resource: USBInstrument) -> None:
+        self.resource = resource
 
     def write(self, msg: str):
         self.resource.write(msg)
