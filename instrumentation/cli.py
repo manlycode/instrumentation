@@ -10,6 +10,7 @@ Be creative! do whatever you want!
 
 from .script import runScript
 
+
 def main():  # pragma: no cover
     """
     The main function executes on commands:
