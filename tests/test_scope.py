@@ -1,5 +1,5 @@
 from tests import scope
-from instrumentation.siglent.scope import BWLimit, Coupling
+from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
 
 channel = scope.channel(1)
 channels = scope.channels([3, 4])
@@ -35,3 +35,35 @@ def test_channels_coupling():
 
     channels.coupling(Coupling.DC)
     assert channels.coupling() == ["DC", "DC"]
+
+
+# def test_channel_impedance():
+#     channel.impedance(Impedance.ONE_MEG)
+#     assert channel.impedance() == "ONEMeg"
+
+#     channel.impedance(Impedance.FIFTY)
+#     assert channel.impedance() == "FIFTy"
+
+
+# def test_channels_impedance():
+#     channels.impedance(Impedance.ONE_MEG)
+#     assert channels.impedance() == ["ONEMeg", "ONEMeg"]
+
+#     channels.impedance(Impedance.FIFTY)
+#     assert channels.impedance() == ["FIFTy", "FIFTy"]
+
+
+def test_channel_invert():
+    channel.invert(True)
+    assert channel.invert() == "ON"
+
+    channel.invert(False)
+    assert channel.invert() == "OFF"
+
+
+def test_channels_invert():
+    channels.invert(True)
+    assert channels.invert() == ["ON", "ON"]
+
+    channels.invert(False)
+    assert channels.invert() == ["OFF", "OFF"]
