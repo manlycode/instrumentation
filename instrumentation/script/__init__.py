@@ -58,13 +58,8 @@ def runScript():
     # print(Freq.MHz(0.00025786))
     # print(Freq.mHz(257.86))
     # print(Freq.uHz(257.86))
+    print(scope.channel(1).label())
 
-    print(scope.channel(1).labelText())
     scope.channel(1).label(True)
-    scope.channel(1).labelText("Bart")
-
-    print(scope.channel(1).labelText())
-    scope.channel(1).label(False)
-    scope.channel(1).bwLimit(BWLimit.BWL_20M)
-
-    print(scope.channels([1, 2]).labelText())
+    sleep(3)
+    print(scope.channel(1).label())
