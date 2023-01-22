@@ -124,3 +124,63 @@ def test_channels_visible():
 
     channels.visible(False)
     assert channels.visible() == ["OFF", "OFF"]
+
+
+def test_channel_OFFSet():
+    pytest.fail()
+    channel.offset()
+
+
+def test_channels_OFFSet():
+    pytest.fail()
+    channels.offset()
+
+
+def test_channel_PROBe():
+    pytest.fail()
+    channel.probe()
+
+
+def test_channels_PROBe():
+    pytest.fail()
+    channels.probe()
+
+
+def test_channel_SCALe():
+    pytest.fail()
+    channel.scale()
+
+
+def test_channels_SCALe():
+    pytest.fail()
+    channels.scale()
+
+
+def test_channel_SKEW():
+    pytest.fail()
+    channel.skew()
+
+
+def test_channels_SKEW():
+    pytest.fail()
+    channels.skew()
+
+
+def test_channel_SWITch():
+    pytest.fail()
+    channel.switch()
+
+
+def test_channels_SWITch():
+    pytest.fail()
+    channels.switch()
+
+
+def test_channel_UNIT():
+    pytest.fail()
+    channel.unit()
+
+
+def test_channels_UNIT():
+    pytest.fail()
+    channels.unit()
