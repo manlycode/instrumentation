@@ -1,5 +1,6 @@
 from enum import IntEnum
 from typing import Optional
+
 from pyvisa.resources.usb import USBInstrument
 
 
@@ -87,20 +88,16 @@ class Channel:
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
-        self.channels: list[Channel] = list(map(
-            lambda x: Channel(x, resource), numbers
-        ))
+        self.channels: list[Channel] = list(
+            map(lambda x: Channel(x, resource), numbers)
+        )
 
     def waveForm(
-        self,
-        limit: Optional[WaveForm] = None
+        self, limit: Optional[WaveForm] = None
     ) -> list[Optional[str]]:
         return list(map(lambda x: x.waveForm(limit), self.channels))
 
-    def frequency(
-        self,
-        limit: Optional[Freq] = None
-    ) -> list[Optional[str]]:
+    def frequency(self, limit: Optional[Freq] = None) -> list[Optional[str]]:
         return list(map(lambda x: x.frequency(limit), self.channels))
 
 
