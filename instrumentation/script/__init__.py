@@ -1,8 +1,15 @@
 import pyvisa
 from time import sleep
 
-from ..siglent import *
-from ..JDS6600 import *
+from ..siglent import (
+    Scope,
+    BWLimit,
+)
+
+from ..JDS6600 import (
+    AWG,
+)
+
 
 def runScript():
     rm = pyvisa.ResourceManager()
@@ -11,11 +18,13 @@ def runScript():
     # scope = rm.open_resource("USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR")
     scope = Scope(rm)
 
-    # awg = rm.open_resource("ASRL1::INSTR")
-    # awg.baud_rate = 115200
+    sleep(0.1)
+    awg = rm.open_resource("ASRL1::INSTR")
+    awg.baud_rate = 115200
     awg = AWG(rm)
 
-    # For communication with the device, the baud rate must be set to 115200, 8 data bits, 1 stop bit and no parity bit are required.
+    # For communication with the device, the baud rate must be set to 115200,
+    # 8 data bits, 1 stop bit and no parity bit are required.
 
     print(scope.query("*IDN?"))
 
@@ -25,8 +34,7 @@ def runScript():
     # scope.write(":CHAN3:BWLimit 20M")
     # scope.write(":CHAN4:BWLimit 20M")
 
-
-    for i in [1,2,3,4]:
+    for i in [1, 2, 3, 4]:
         scope.write(f':CHAN{i}:BWLimit 20M')
 
     # for i in [1,2,3,4]:
@@ -40,7 +48,6 @@ def runScript():
 
     # awg.write(":w21=3.")
     # awg.write(":w23=25786,0.")
-
 
     # print(awg.channels([1, 2]).waveForm())
     # awg.channels([1, 2]).waveForm(WaveForm.HALF_WAVE)
@@ -60,4 +67,4 @@ def runScript():
     scope.channel(1).label(False)
     scope.channel(1).bwLimit(BWLimit.BWL_20M)
 
-    print(scope.channels([1,2]).labelText())
+    print(scope.channels([1, 2]).labelText())
