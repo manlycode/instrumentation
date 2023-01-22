@@ -59,30 +59,29 @@ class Channel:
         self.resource = resource
 
     def waveForm(self, wf: Optional[WaveForm] = None) -> Optional[str]:
-
         cmdOffset = 0
-        if wf is None:
-            cmd = f":r2{self.number+cmdOffset}=."
-            print(cmd)
-            return self.resource.query(cmd)
+        result = None
+
+        if wf is not None:
+            cmd = f":w2{self.number+cmdOffset}={wf.value}.\r\n"
+            self.resource.query(cmd)
 
         else:
-            cmd = f":w2{self.number+cmdOffset}={wf.value}.\n"
-            print(cmd)
-            self.resource.write(cmd)
-            return None
+            cmd = f":r2{self.number+cmdOffset}=.\r\n"
+            self.resource.query(cmd)
+            result = self.resource.query(cmd).strip()
+
+        return result
 
     def frequency(self, freq: Optional[Freq] = None) -> Optional[str]:
         cmdOffset = 2
         if freq is None:
             cmd = f":r2{self.number+cmdOffset}=."
-            print(cmd)
-            return self.resource.query(cmd)
+            return self.resource.query(cmd).strip()
 
         else:
             cmd = f":w2{self.number+cmdOffset}={freq}.\n"
-            print(cmd)
-            self.resource.write(cmd)
+            self.resource.query(cmd)
             return None
 
 
