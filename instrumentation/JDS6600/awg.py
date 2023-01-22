@@ -79,13 +79,11 @@ class Channel:
         cmdOffset = 2
         if freq is None:
             cmd = f":r2{self.number+cmdOffset}=."
-            print(cmd)
-            return self.resource.query(cmd)
+            return self.resource.query(cmd).strip()
 
         else:
             cmd = f":w2{self.number+cmdOffset}={freq}.\n"
-            print(cmd)
-            self.resource.write(cmd)
+            self.resource.query(cmd)
             return None
 
 
