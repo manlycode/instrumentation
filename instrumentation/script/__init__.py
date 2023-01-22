@@ -1,14 +1,9 @@
-import pyvisa
 from time import sleep
 
-from ..siglent import (
-    Scope,
-    BWLimit,
-)
+import pyvisa
 
-from ..JDS6600 import (
-    AWG,
-)
+from ..JDS6600 import AWG
+from ..siglent import BWLimit, Scope
 
 
 def runScript():
@@ -35,10 +30,10 @@ def runScript():
     # scope.write(":CHAN4:BWLimit 20M")
 
     for i in [1, 2, 3, 4]:
-        scope.write(f':CHAN{i}:BWLimit 20M')
+        scope.write(f":CHAN{i}:BWLimit 20M")
 
     # for i in [1,2,3,4]:
-        # print(scope.query(f':CHAN{i}:BWLimit?'))
+    # print(scope.query(f':CHAN{i}:BWLimit?'))
 
     scope.channel(1).bwLimit(BWLimit.BWL_20M)
     print(scope.channel(1).bwLimit())

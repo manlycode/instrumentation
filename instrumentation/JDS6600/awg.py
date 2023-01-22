@@ -1,5 +1,6 @@
-from pyvisa import ResourceManager
 from enum import IntEnum
+
+from pyvisa import ResourceManager
 
 
 class WaveForm(IntEnum):
@@ -28,22 +29,22 @@ class Freq:
         self.scale = scale
 
     def __str__(self):
-        return f'{self.value},{self.scale}'
+        return f"{self.value},{self.scale}"
 
     def Hz(val: float):
-        return Freq(int(val*100), 0)
+        return Freq(int(val * 100), 0)
 
     def kHz(val: float):
-        return Freq(int(val*10000), 1)
+        return Freq(int(val * 10000), 1)
 
     def MHz(val: float):
-        return Freq(int(val*100000000), 2)
+        return Freq(int(val * 100000000), 2)
 
     def mHz(val: float):
-        return Freq(int(val*100), 3)
+        return Freq(int(val * 100), 3)
 
     def uHz(val: float):
-        return Freq(int(val*100), 4)
+        return Freq(int(val * 100), 4)
 
 
 class Channel:
@@ -54,33 +55,33 @@ class Channel:
     def waveForm(self, wf: WaveForm = None) -> str:
         cmdOffset = 0
         if wf is None:
-            cmd = f':r2{self.number+cmdOffset}=.'
+            cmd = f":r2{self.number+cmdOffset}=."
             print(cmd)
             return self.resource.query(cmd)
 
         else:
-            cmd = f':w2{self.number+cmdOffset}={wf.value}.\n'
+            cmd = f":w2{self.number+cmdOffset}={wf.value}.\n"
             print(cmd)
             return self.resource.write(cmd)
 
     def frequency(self, freq: Freq = None) -> str:
         cmdOffset = 2
         if freq is None:
-            cmd = f':r2{self.number+cmdOffset}=.'
+            cmd = f":r2{self.number+cmdOffset}=."
             print(cmd)
             return self.resource.query(cmd)
 
         else:
-            cmd = f':w2{self.number+cmdOffset}={freq}.\n'
+            cmd = f":w2{self.number+cmdOffset}={freq}.\n"
             print(cmd)
             return self.resource.write(cmd)
 
 
-class ChannelList():
+class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
         self.channels: list[Channel] = map(
             lambda x: Channel(x, resource), numbers
-            )
+        )
 
     def waveForm(self, limit: WaveForm = None) -> list[str]:
         return list(map(lambda x: x.waveForm(limit), self.channels))

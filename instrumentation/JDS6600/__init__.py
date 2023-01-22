@@ -1,9 +1,3 @@
-from .awg import AWG
-from .awg import WaveForm
-from .awg import Freq
+from .awg import AWG, Freq, WaveForm
 
-__all__ = [
-    'AWG',
-    'WaveForm',
-    'Freq'
-    ]
+__all__ = ["AWG", "WaveForm", "Freq"]
