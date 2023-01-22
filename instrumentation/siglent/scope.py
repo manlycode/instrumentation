@@ -6,6 +6,7 @@ class BWLimit(Enum):
     BWL_200M = "200M"
     BWL_FULL = "FULL"
 
+
 class Coupling(Enum):
     AC = "AC"
     DC = "DC"

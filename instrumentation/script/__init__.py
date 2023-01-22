@@ -8,7 +8,6 @@ def runScript():
     rm = pyvisa.ResourceManager()
     print(rm.list_resources())
 
-
     # scope = rm.open_resource("USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR")
     scope = Scope(rm)
 

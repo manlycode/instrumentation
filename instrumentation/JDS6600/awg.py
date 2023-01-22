@@ -3,23 +3,24 @@ from enum import IntEnum
 
 
 class WaveForm(IntEnum):
-    SINE=0
-    SQUARE=1
-    PULSE=2
-    TRIANGLE=3
-    PARTIAL_SINE=4
-    CMOS_WAVE=5
-    DC_LEVEL=6
-    HALF_WAVE=7
-    FULL_WAVE=8
-    POSITIVE_STEP=9
-    NEGATIVE_STEP=10
-    NOISE=11
-    EXPONENTIAL=12
-    EXPONENTIAL_DECAY=13
-    MULTI_TONE=14
-    SINC=15
-    LORENZ_PULSE=16
+    SINE = 0
+    SQUARE = 1
+    PULSE = 2
+    TRIANGLE = 3
+    PARTIAL_SINE = 4
+    CMOS_WAVE = 5
+    DC_LEVEL = 6
+    HALF_WAVE = 7
+    FULL_WAVE = 8
+    POSITIVE_STEP = 9
+    NEGATIVE_STEP = 10
+    NOISE = 11
+    EXPONENTIAL = 12
+    EXPONENTIAL_DECAY = 13
+    MULTI_TONE = 14
+    SINC = 15
+    LORENZ_PULSE = 16
+
 
 class Freq:
     def __init__(self, value: int, scale: int) -> None:
@@ -34,13 +35,13 @@ class Freq:
 
     def kHz(val: float):
         return Freq(int(val*10000), 1)
-    
+
     def MHz(val: float):
         return Freq(int(val*100000000), 2)
 
     def mHz(val: float):
         return Freq(int(val*100), 3)
-    
+
     def uHz(val: float):
         return Freq(int(val*100), 4)
 
@@ -49,7 +50,7 @@ class Channel:
     def __init__(self, number: int, resource) -> None:
         self.number = number
         self.resource = resource
-            
+
     def waveForm(self, wf: WaveForm = None) -> str:
         cmdOffset = 0
         if wf is None:
@@ -74,9 +75,12 @@ class Channel:
             print(cmd)
             return self.resource.write(cmd)
 
+
 class ChannelList():
     def __init__(self, resource, numbers: list[int]) -> None:
-        self.channels: list[Channel] = map(lambda x: Channel(x, resource), numbers)
+        self.channels: list[Channel] = map(
+            lambda x: Channel(x, resource), numbers
+            )
 
     def waveForm(self, limit: WaveForm = None) -> list[str]:
         return list(map(lambda x: x.waveForm(limit), self.channels))
@@ -102,7 +106,6 @@ class AWG:
 
     def channel(self, number: int) -> Channel:
         return Channel(number, self.resource)
-    
+
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
-
