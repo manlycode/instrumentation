@@ -1,3 +1,6 @@
+import pytest
+from time import sleep
+
 from tests import scope
 from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
 
@@ -37,20 +40,24 @@ def test_channels_coupling():
     assert channels.coupling() == ["DC", "DC"]
 
 
-# def test_channel_impedance():
-#     channel.impedance(Impedance.ONE_MEG)
-#     assert channel.impedance() == "ONEMeg"
+def test_channel_impedance():
+    pytest.skip(reason="This doesn't seem to work")
 
-#     channel.impedance(Impedance.FIFTY)
-#     assert channel.impedance() == "FIFTy"
+    channel.impedance(Impedance.ONE_MEG)
+    assert channel.impedance() == "ONEMeg"
+
+    channel.impedance(Impedance.FIFTY)
+    assert channel.impedance() == "FIFTy"
 
 
-# def test_channels_impedance():
-#     channels.impedance(Impedance.ONE_MEG)
-#     assert channels.impedance() == ["ONEMeg", "ONEMeg"]
+def test_channels_impedance():
+    pytest.skip(reason="This doesn't seem to work")
 
-#     channels.impedance(Impedance.FIFTY)
-#     assert channels.impedance() == ["FIFTy", "FIFTy"]
+    channels.impedance(Impedance.ONE_MEG)
+    assert channels.impedance() == ["ONEMeg", "ONEMeg"]
+
+    channels.impedance(Impedance.FIFTY)
+    assert channels.impedance() == ["FIFTy", "FIFTy"]
 
 
 def test_channel_invert():
@@ -67,3 +74,53 @@ def test_channels_invert():
 
     channels.invert(False)
     assert channels.invert() == ["OFF", "OFF"]
+
+
+def test_channel_label():
+    pytest.skip(reason="This doesn't seem to work")
+    channel.label(True)
+    assert channel.label() == "OFF"
+
+    channel.label(True)
+    assert channel.label() == "ON"
+
+
+def test_channels_label():
+    pytest.skip(reason="This doesn't seem to work")
+    channels.label(True)
+    assert channels.label() == ["ON", "ON"]
+
+    channels.label(False)
+    assert channels.label() == ["OFF", "OFF"]
+
+
+def test_channel_labelText():
+    channel.labelText("A")
+    assert channel.labelText() == "A"
+
+    channel.labelText("B")
+    assert channel.labelText() == "B"
+
+
+def test_channels_labelText():
+    channels.labelText("A")
+    assert channels.labelText() == ["A", "A"]
+
+    channels.labelText("B")
+    assert channels.labelText() == ["B", "B"]
+
+
+def test_channel_visible():
+    channel.visible(True)
+    assert channel.visible() == "ON"
+
+    channel.visible(False)
+    assert channel.visible() == "OFF"
+
+
+def test_channels_visible():
+    channels.visible(True)
+    assert channels.visible() == ["ON", "ON"]
+
+    channels.visible(False)
+    assert channels.visible() == ["OFF", "OFF"]

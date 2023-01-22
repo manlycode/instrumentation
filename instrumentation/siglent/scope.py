@@ -27,19 +27,20 @@ class Flag(Enum):
 
     @staticmethod
     def fromBool(val: Optional[bool] = None):
-        state = None
+        if val is False:
+            return Flag.OFF
 
-        if val is not None:
-            state = Flag.ON if val else Flag.OFF
+        if val is True:
+            return Flag.ON
 
-        return state
+        return None
 
 
 class Channel:
     def __init__(self, number: int, resource) -> None:
         self.number = number
         self.resource: USBInstrument = resource
-        self.chanCmdRoot = f":CHAN{self.number}"
+        self.chanCmdRoot = f":CHANnel{self.number}"
 
     def __dispatch_enum(self, cmdRoot: str, arg):
         if arg is None:
@@ -61,11 +62,13 @@ class Channel:
     def __dispatch_string(self, cmdRoot: str, arg):
         if arg is None:
             cmd = f"{cmdRoot}?"
+            print(f"query.cmd: {cmd}")
             return self.resource.query(cmd).rstrip()
 
         else:
             cmd = f"{cmdRoot} {arg}"
-            self.resource.write(cmd)
+            print(f"write.cmd: {cmd}")
+            print(self.resource.write(cmd))
             return None
 
     def bwLimit(self, limit: Optional[BWLimit] = None) -> str:
@@ -87,11 +90,16 @@ class Channel:
 
     def label(self, state: Optional[bool] = None):
         cmdRoot = f"{self.chanCmdRoot}:LABel"
-        return self.__dispatch_enum(cmdRoot, Flag.fromBool(state))
+        flag = Flag.fromBool(state)
+        return self.__dispatch_enum(cmdRoot, flag)
 
     def labelText(self, label: Optional[str] = None):
         cmdRoot = f"{self.chanCmdRoot}:LABel:TEXT"
         return self.__dispatch_quoted_string(cmdRoot, label)
+
+    def visible(self, state: Optional[bool] = None):
+        cmdRoot = f"{self.chanCmdRoot}:VIS"
+        return self.__dispatch_enum(cmdRoot, Flag.fromBool(state))
 
 
 class ChannelList:
@@ -117,6 +125,9 @@ class ChannelList:
 
     def labelText(self, label: Optional[str] = None) -> list[str]:
         return list(map(lambda x: x.labelText(label), self.channels))
+
+    def visible(self, vis: Optional[bool] = None) -> list[str]:
+        return list(map(lambda x: x.invert(vis), self.channels))
 
 
 class Scope:
