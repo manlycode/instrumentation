@@ -1,4 +1,5 @@
 from enum import IntEnum
+from typing import Optional
 
 from pyvisa import ResourceManager
 
@@ -52,7 +53,7 @@ class Channel:
         self.number = number
         self.resource = resource
 
-    def waveForm(self, wf: WaveForm = None) -> str:
+    def waveForm(self, wf: Optional[WaveForm] = None) -> str:
         cmdOffset = 0
         if wf is None:
             cmd = f":r2{self.number+cmdOffset}=."
@@ -64,7 +65,7 @@ class Channel:
             print(cmd)
             return self.resource.write(cmd)
 
-    def frequency(self, freq: Freq = None) -> str:
+    def frequency(self, freq: Optional[Freq] = None) -> str:
         cmdOffset = 2
         if freq is None:
             cmd = f":r2{self.number+cmdOffset}=."
@@ -83,10 +84,10 @@ class ChannelList:
             lambda x: Channel(x, resource), numbers
         )
 
-    def waveForm(self, limit: WaveForm = None) -> list[str]:
+    def waveForm(self, limit: Optional[WaveForm] = None) -> list[str]:
         return list(map(lambda x: x.waveForm(limit), self.channels))
 
-    def frequency(self, limit: WaveForm = None) -> list[str]:
+    def frequency(self, limit: Optional[WaveForm] = None) -> list[str]:
         return list(map(lambda x: x.frequency(limit), self.channels))
 
 
