@@ -124,7 +124,6 @@ class Scope:
 
     def __init__(self, resource: USBInstrument) -> None:
         self.resource = resource
-        print(f"the Type{type(self.resource)}")
 
     def write(self, msg: str):
         self.resource.write(msg)
