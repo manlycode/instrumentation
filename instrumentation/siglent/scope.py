@@ -80,7 +80,7 @@ class Channel:
         return self.__dispatch_enum(cmdRoot, cpl)
 
     def impedance(self, imp: Optional[Impedance] = None):
-        # NOTE: doesn't work on SDS1104X-U
+        # NOTE: SDS1104X-U only provides ONEMeg
         cmdRoot = f"{self.chanCmdRoot}:IMPedance"
         return self.__dispatch_enum(cmdRoot, imp)
 

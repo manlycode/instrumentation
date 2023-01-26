@@ -1,4 +1,4 @@
-from time import sleep
+import pytest
 
 from tests import awg
 from instrumentation.JDS6600.awg import WaveForm, Freq
@@ -37,6 +37,12 @@ def test_channel_frequency():
     assert channel.frequency() == ":r23=25786,4."
 
 
-def test_channels_frequency():
-    channels.frequency(Freq.kHz(0.5786))
-    assert channels.frequency() == [":r23=5786,1.", ":r24=5786,1."]
+def test_channels_phase():
+    # You can't call that on channel 1
+    with pytest.raises(RuntimeError):
+        channel.phase(10.0)
+
+    assert awg.channel(2).phase(10.0) == ":ok"
+    assert awg.channel(2).phase() == ":r31=100."
+
+
