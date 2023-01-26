@@ -1,5 +1,4 @@
 import pytest
-from time import sleep
 
 from tests import scope
 from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
