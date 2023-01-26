@@ -31,4 +31,5 @@ def runScript():
     # Setup Waves
     awg.channel(1).frequency(Freq.Hz(10))
     awg.channel(1).waveForm(WaveForm.SINE)
-    awg.channel(1).amplitude(2.0)
+    awg.channel(1).offset(0.0)
+    awg.channel(1).amplitude(1.0)
