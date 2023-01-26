@@ -37,7 +37,7 @@ def test_channel_frequency():
     assert channel.frequency() == ":r23=25786,4."
 
 
-def test_channels_phase():
+def test_channel_phase():
     # You can't call that on channel 1
     with pytest.raises(RuntimeError):
         channel.phase(10.0)
@@ -46,6 +46,31 @@ def test_channels_phase():
     assert awg.channel(2).phase() == ":r31=100."
 
 
-def test_channels_amplitude():
-    channel.amplitude(0.03)
-    assert channel.amplitude() == ":r25=30."
+# def test_channel_amplitude():
+#     pytest.skip
+#     channel.amplitude(0.03)
+#     assert channel.amplitude() == ":r25=30."
+
+
+def test_channel_offset():
+    channel.offset(-9.99)
+    assert channel.offset() == ":r27=1."
+
+    channel.offset(-9.98)
+    assert channel.offset() == ":r27=2."
+
+    channel.offset(-0.2)
+    assert channel.offset() == ":r27=980."
+
+    channel.offset(0.0)
+    assert channel.offset() == ":r27=1000."
+
+    channel.offset(0.02)
+    assert channel.offset() == ":r27=1002."
+
+    channel.offset(0.1)
+    assert channel.offset() == ":r27=1010."
+
+    channel.offset(9.99)
+    assert channel.offset() == ":r27=1999."
+

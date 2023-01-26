@@ -111,6 +111,18 @@ class Channel:
 
         return self.__dispatch(cmd)
 
+    def offset(self, volts: Optional[float] = None):
+        cmdOffset = 6
+        if volts is not None:
+            value = 1000 + int((volts * 100.0))
+            cmd = f":w2{self.number+cmdOffset}={value}."
+            print(cmd)
+
+        else:
+            cmd = f":r2{self.number+cmdOffset}=."
+
+        return self.__dispatch(cmd)
+
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
