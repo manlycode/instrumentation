@@ -101,6 +101,10 @@ class Channel:
         cmdRoot = f"{self.chanCmdRoot}:VIS"
         return self.__dispatch_enum(cmdRoot, Flag.fromBool(state))
 
+    def switch(self, state: Optional[bool] = None):
+        cmdRoot = f"{self.chanCmdRoot}:SWITch"
+        return self.__dispatch_enum(cmdRoot, Flag.fromBool(state))
+
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
@@ -127,7 +131,10 @@ class ChannelList:
         return list(map(lambda x: x.labelText(label), self.channels))
 
     def visible(self, vis: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.invert(vis), self.channels))
+        return list(map(lambda x: x.visible(vis), self.channels))
+
+    def switch(self, state: Optional[bool] = None) -> list[str]:
+        return list(map(lambda x: x.switch(state), self.channels))
 
 
 class Scope:
@@ -138,6 +145,9 @@ class Scope:
 
     def write(self, msg: str):
         self.resource.write(msg)
+
+    def reset(self):
+        return self.resource.write("*RST")
 
     def query(self, msg: str) -> str:
         return self.resource.query(msg)

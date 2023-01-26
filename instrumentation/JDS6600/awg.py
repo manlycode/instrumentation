@@ -100,6 +100,17 @@ class Channel:
 
         return self.__dispatch(cmd)
 
+    def amplitude(self, volts: Optional[float] = None):
+        cmdOffset = 4
+        if volts is not None:
+            value = int(volts * 1000.0)
+            cmd = f":w2{self.number+cmdOffset}={value}."
+
+        else:
+            cmd = f":r2{self.number+cmdOffset}=."
+
+        return self.__dispatch(cmd)
+
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
@@ -134,3 +145,9 @@ class AWG:
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
+
+    def print_all_values(self):
+        for x in range(int(100)):
+            cmd = f"r{x}=."
+            print(cmd)
+            print(self.resource.query(cmd))

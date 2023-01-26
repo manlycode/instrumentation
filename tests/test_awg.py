@@ -46,3 +46,6 @@ def test_channels_phase():
     assert awg.channel(2).phase() == ":r31=100."
 
 
+def test_channels_amplitude():
+    channel.amplitude(0.03)
+    assert channel.amplitude() == ":r25=30."
