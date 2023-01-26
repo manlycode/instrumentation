@@ -99,6 +99,7 @@ class Scope:
 
     def __init__(self, resource: USBInstrument) -> None:
         self.resource = resource
+        self.measure = Measure(self.resource)
 
     def write(self, msg: str):
         self.resource.write(msg)
@@ -111,9 +112,6 @@ class Scope:
 
     def channel(self, number: int) -> Channel:
         return Channel(number, self.resource)
-
-    def measure(self) -> Measure:
-        return Measure(self.resource)
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)

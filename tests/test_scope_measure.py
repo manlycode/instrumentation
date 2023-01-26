@@ -1,6 +1,9 @@
-from tests import awg
+from tests import scope
 
 
 def test_measure():
-    awg.measure.enable(True)
-    assert awg.measure.enable() == "ON"
+    scope.measure.enable(True)
+    assert scope.measure.enable() == "ON"
+
+    scope.measure.enable(False)
+    assert scope.measure.enable() == "OFF"
