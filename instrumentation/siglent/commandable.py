@@ -40,6 +40,12 @@ class Commandable:
             self.resource.write(cmd)
             return None
 
+    def write(self, cmd: str) -> int:
+        return self.resource.write(cmd)
+
+    def query(self, cmd: str) -> str:
+        return self.resource.query(cmd)
+
     def __dispatch_string(self, cmdRoot: str, arg):
         if arg is None:
             cmd = f"{cmdRoot}?"

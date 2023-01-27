@@ -73,4 +73,3 @@ def test_channel_offset():
 
     channel.offset(9.99)
     assert channel.offset() == ":r27=1999."
-

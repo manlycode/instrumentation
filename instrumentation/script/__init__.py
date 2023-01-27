@@ -1,7 +1,8 @@
 from time import sleep
-from instrumentation.JDS6600.awg import Freq
 
 import pyvisa
+
+from instrumentation.JDS6600.awg import Freq
 
 from ..JDS6600 import AWG, WaveForm
 from ..siglent import BWLimit, Coupling, Scope

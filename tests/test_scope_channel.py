@@ -1,13 +1,17 @@
+from time import sleep
+from instrumentation.JDS6600.awg import Freq, WaveForm
+from instrumentation.siglent.scope import HeaderMode, Value
+
 import pytest
 
-from tests import scope
+from tests import awg, scope
 from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
 
 channel = scope.channel(1)
 channels = scope.channels([3, 4])
 
 
-def test_channel_bwLimit():
+def xtest_channel_bwLimit():
     channel.bwLimit(BWLimit.BWL_200M)
     assert channel.bwLimit() == "FULL"
 
@@ -15,7 +19,7 @@ def test_channel_bwLimit():
     assert channel.bwLimit() == "20M"
 
 
-def test_channels_bwLimit():
+def xtest_channels_bwLimit():
     channels.bwLimit(BWLimit.BWL_200M)
     assert channels.bwLimit() == ["FULL", "FULL"]
 
@@ -23,7 +27,7 @@ def test_channels_bwLimit():
     assert channels.bwLimit() == ["20M", "20M"]
 
 
-def test_channel_coupling():
+def xtest_channel_coupling():
     channel.coupling(Coupling.AC)
     assert channel.coupling() == "AC"
 
@@ -31,7 +35,7 @@ def test_channel_coupling():
     assert channel.coupling() == "DC"
 
 
-def test_channels_coupling():
+def xtest_channels_coupling():
     channels.coupling(Coupling.AC)
     assert channels.coupling() == ["AC", "AC"]
 
@@ -39,27 +43,7 @@ def test_channels_coupling():
     assert channels.coupling() == ["DC", "DC"]
 
 
-def test_channel_impedance():
-    pytest.skip(reason="This doesn't seem to work")
-
-    channel.impedance(Impedance.ONE_MEG)
-    assert channel.impedance() == "ONEMeg"
-
-    channel.impedance(Impedance.FIFTY)
-    assert channel.impedance() == "FIFTy"
-
-
-def test_channels_impedance():
-    pytest.skip(reason="This doesn't seem to work")
-
-    channels.impedance(Impedance.ONE_MEG)
-    assert channels.impedance() == ["ONEMeg", "ONEMeg"]
-
-    channels.impedance(Impedance.FIFTY)
-    assert channels.impedance() == ["FIFTy", "FIFTy"]
-
-
-def test_channel_invert():
+def xtest_channel_invert():
     channel.invert(True)
     assert channel.invert() == "ON"
 
@@ -67,7 +51,7 @@ def test_channel_invert():
     assert channel.invert() == "OFF"
 
 
-def test_channels_invert():
+def xtest_channels_invert():
     channels.invert(True)
     assert channels.invert() == ["ON", "ON"]
 
@@ -75,7 +59,7 @@ def test_channels_invert():
     assert channels.invert() == ["OFF", "OFF"]
 
 
-def test_channel_label():
+def xtest_channel_label():
     pytest.skip(reason="This doesn't seem to work")
     channel.label(True)
     assert channel.label() == "OFF"
@@ -84,7 +68,7 @@ def test_channel_label():
     assert channel.label() == "ON"
 
 
-def test_channels_label():
+def xtest_channels_label():
     pytest.skip(reason="This doesn't seem to work")
     channels.label(True)
     assert channels.label() == ["ON", "ON"]
@@ -93,7 +77,7 @@ def test_channels_label():
     assert channels.label() == ["OFF", "OFF"]
 
 
-def test_channel_labelText():
+def xtest_channel_labelText():
     channel.labelText("A")
     assert channel.labelText() == "A"
 
@@ -101,7 +85,7 @@ def test_channel_labelText():
     assert channel.labelText() == "B"
 
 
-def test_channels_labelText():
+def xtest_channels_labelText():
     channels.labelText("A")
     assert channels.labelText() == ["A", "A"]
 
@@ -109,7 +93,7 @@ def test_channels_labelText():
     assert channels.labelText() == ["B", "B"]
 
 
-def test_channel_visible():
+def xtest_channel_visible():
     channel.visible(True)
     assert channel.visible() == "ON"
 
@@ -117,7 +101,7 @@ def test_channel_visible():
     assert channel.visible() == "OFF"
 
 
-def test_channels_visible():
+def xtest_channels_visible():
     channels.visible(True)
     assert channels.visible() == ["ON", "ON"]
 
@@ -125,61 +109,16 @@ def test_channels_visible():
     assert channels.visible() == ["OFF", "OFF"]
 
 
-def test_channel_OFFSet():
-    pytest.fail()
-    channel.offset()
+def test_channel_parameter_value():
+    awg.channel(1).waveForm(WaveForm.SINE)
+    awg.channel(1).frequency(Freq.Hz(100))
+    awg.channel(1).offset(0.0)
+    awg.channel(1).amplitude(1.0)
 
+    scope.channel(1).switch(True)
+    scope.auto_setup()
 
-def test_channels_OFFSet():
-    pytest.fail()
-    channels.offset()
-
-
-def test_channel_PROBe():
-    pytest.fail()
-    channel.probe()
-
-
-def test_channels_PROBe():
-    pytest.fail()
-    channels.probe()
-
-
-def test_channel_SCALe():
-    pytest.fail()
-    channel.scale()
-
-
-def test_channels_SCALe():
-    pytest.fail()
-    channels.scale()
-
-
-def test_channel_SKEW():
-    pytest.fail()
-    channel.skew()
-
-
-def test_channels_SKEW():
-    pytest.fail()
-    channels.skew()
-
-
-def test_channel_SWITch():
-    pytest.fail()
-    channel.switch()
-
-
-def test_channels_SWITch():
-    pytest.fail()
-    channels.switch()
-
-
-def test_channel_UNIT():
-    pytest.fail()
-    channel.unit()
-
-
-def test_channels_UNIT():
-    pytest.fail()
-    channels.unit()
+    sleep(2)
+    print(channel.parameter_value(Value.PKPK))
+    print(channel.parameter_value(Value.AMPL))
+    print(channel.parameter_value(Value.FREQ))

@@ -1,8 +1,42 @@
-from enum import Enum
+from enum import Enum, auto
 from typing import Optional
-from instrumentation.siglent.commandable import Commandable, Flag
-from instrumentation.siglent.measure import Measure
+
 from pyvisa.resources.usb import USBInstrument
+
+from instrumentation.siglent.commandable import Commandable, Flag
+
+
+class HeaderMode(Enum):
+    SHORT = "SHORT"
+    LONG = "LONG"
+    OFF = "OFF"
+
+
+class Value(Enum):
+    PKPK = auto()
+    MAX = auto()
+    MIN = auto()
+    AMPL = auto()
+    TOP = auto()
+    BASE = auto()
+    CMEAN = auto()
+    MEAN = auto()
+    RMS = auto()
+    CRMS = auto()
+    OVSN = auto()
+    FPRE = auto()
+    OVSP = auto()
+    RPRE = auto()
+    PER = auto()
+    FREQ = auto()
+    PWID = auto()
+    NWID = auto()
+    RISE = auto()
+    FALL = auto()
+    WID = auto()
+    DUTY = auto()
+    NDUTY = auto()
+    ALL = auto()
 
 
 class BWLimit(Enum):
@@ -23,6 +57,30 @@ class Impedance(Enum):
 
 
 class Channel(Commandable):
+    """
+    The CHANNEL subsystem commands control the analog channels. Channels
+    areindependently programmable for offset, probe, coupling, bandwidth
+    limit, inversion, and more functions. The channel index (1, 2, 3, or 4)
+    specified in the command selects the analog channel that is affected by
+    the command.
+
+    Args:
+        Commandable (_type_): _description_
+
+    TODO:
+        - [ ] ATTN
+        - [ ] BWL
+        - [ ] CPL
+        - [ ] OFST
+        - [ ] SKEW
+        - [ ] TRA
+        - [ ] UNIT
+        - [ ] VDIV
+        - [ ] INVS
+
+
+    """
+
     def __init__(self, number: int, resource) -> None:
         self.number = number
         self.chanCmdRoot = f":CHANnel{self.number}"
@@ -35,11 +93,6 @@ class Channel(Commandable):
     def coupling(self, cpl: Optional[Coupling] = None):
         cmdRoot = f"{self.chanCmdRoot}:COUPling"
         return self.dispatch_enum(cmdRoot, cpl)
-
-    def impedance(self, imp: Optional[Impedance] = None):
-        # NOTE: SDS1104X-U only provides ONEMeg
-        cmdRoot = f"{self.chanCmdRoot}:IMPedance"
-        return self.dispatch_enum(cmdRoot, imp)
 
     def invert(self, inv: Optional[bool] = None):
         cmdRoot = f"{self.chanCmdRoot}:INVert"
@@ -62,6 +115,14 @@ class Channel(Commandable):
         cmdRoot = f"{self.chanCmdRoot}:SWITch"
         return self.dispatch_enum(cmdRoot, Flag.fromBool(state))
 
+    def parameter_value(self, value: Value):
+        cmd = f":C{self.number}:PARAMETER_VALUE? {value.name}"
+        result = self.resource.query(cmd)
+        split_result = str.split(result, ",")[1]
+        print(split_result)
+
+        return self.resource.query(cmd)
+
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
@@ -74,9 +135,6 @@ class ChannelList:
 
     def coupling(self, cpl: Optional[Coupling] = None) -> list[str]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
-
-    def impedance(self, imp: Optional[Impedance] = None) -> list[str]:
-        return list(map(lambda x: x.impedance(imp), self.channels))
 
     def invert(self, inv: Optional[bool] = None) -> list[str]:
         return list(map(lambda x: x.invert(inv), self.channels))
@@ -94,12 +152,36 @@ class ChannelList:
         return list(map(lambda x: x.switch(state), self.channels))
 
 
-class Scope:
+class Scope(Commandable):
+    """_summary_
+
+    Args:
+        Commandable (_type_): _description_
+
+    Returns:
+        _type_: _description_
+
+    TODO:
+        - [ ] *IDN?(IdentificationNumber)
+        - [ ] *OPC(OperationComplete)
+        - [ ] *RST(Reset)
+        (Pg. 18)
+
+        - [ ] SCDP
+        (Pg. 148)
+
+        - [ ] *RCL
+        - [ ] RCPN
+        (Pg. 150)
+
+        - [ ] INR? (Page 174)
+
+    """
+
     RESOURCE_ID = "USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR"
 
     def __init__(self, resource: USBInstrument) -> None:
-        self.resource = resource
-        self.measure = Measure(self.resource)
+        super().__init__(resource)
 
     def write(self, msg: str):
         self.resource.write(msg)
@@ -115,3 +197,9 @@ class Scope:
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
+
+    def comm_header(self, mode: Optional[HeaderMode] = None) -> str:
+        return super().dispatch_enum("CHDR", mode)
+
+    def auto_setup(self):
+        super().write("ASET")
