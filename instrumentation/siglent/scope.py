@@ -7,7 +7,13 @@ from instrumentation.siglent.commandable import Commandable, Flag
 
 
 class ScopeId:
-    def __init__(self, response: str) -> None:
+    def __init__(self, response: str):
+        """
+        Initialized ScopeId
+
+        Args:
+            response (str): String response from *IDC? query
+        """
         splitResponse = response.strip().split(",")
         self.manufacturer = splitResponse[0]
         self.model = splitResponse[1]
@@ -214,6 +220,15 @@ class Scope(Commandable):
         super().write("ASET")
 
     def idn(self) -> ScopeId:
+        """
+        The *IDN? query identifies the instrument type and software version.
+        The response consists of four different fields providing information
+        on the manufacturer, the scope model, the serial number and the
+        firmware revision.
+
+        Returns:
+            ScopeId: Identifying information for a scope
+        """
         res = super().query("*IDN?")
         print(res)
         return ScopeId(res)
