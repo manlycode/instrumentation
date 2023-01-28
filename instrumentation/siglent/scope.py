@@ -202,8 +202,6 @@ class Scope(Commandable):
     def write(self, msg: str):
         self.resource.write(msg)
 
-
-
     def query(self, msg: str) -> str:
         return self.resource.query(msg)
 
