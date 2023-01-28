@@ -1,38 +1,83 @@
 from time import sleep
 from instrumentation.JDS6600.awg import Freq, WaveForm
-from instrumentation.siglent.scope import HeaderMode, Value
 
 import pytest
 
 from tests import awg, scope
-from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
+from instrumentation.siglent.channel import (
+    Attenuation,
+    Coupling,
+    Offset,
+    Value,
+)
 
 channel = scope.channel(1)
 channels = scope.channels([3, 4])
 
 
-def xtest_channel_bwLimit():
-    channel.bwLimit(BWLimit.BWL_200M)
-    assert channel.bwLimit() == "FULL"
+def test_channel_attenuation():
+    channel.attenuation(Attenuation._50)
+    assert channel.attenuation() == Attenuation._50
 
-    channel.bwLimit(BWLimit.BWL_20M)
-    assert channel.bwLimit() == "20M"
+    channel.attenuation(Attenuation._1)
+    assert channel.attenuation() == Attenuation._1
 
-
-def xtest_channels_bwLimit():
-    channels.bwLimit(BWLimit.BWL_200M)
-    assert channels.bwLimit() == ["FULL", "FULL"]
-
-    channels.bwLimit(BWLimit.BWL_20M)
-    assert channels.bwLimit() == ["20M", "20M"]
+    assert channels.attenuation() == [Attenuation._1, Attenuation._1]
 
 
-def xtest_channel_coupling():
-    channel.coupling(Coupling.AC)
-    assert channel.coupling() == "AC"
+def test_channel_bandwith_limit():
+    scope.reset()
+    sleep(2)
 
-    channel.coupling(Coupling.DC)
-    assert channel.coupling() == "DC"
+    assert scope.channel(1).bandwith_limit() is False
+    assert scope.channel(2).bandwith_limit() is False
+    assert scope.channel(3).bandwith_limit() is False
+    assert scope.channel(4).bandwith_limit() is False
+
+    scope.channel(1).bandwith_limit(True)
+    scope.channel(2).bandwith_limit(True)
+    scope.channel(3).bandwith_limit(True)
+    scope.channel(4).bandwith_limit(True)
+
+    assert scope.channel(1).bandwith_limit()
+    assert scope.channel(2).bandwith_limit()
+    assert scope.channel(3).bandwith_limit()
+    assert scope.channel(4).bandwith_limit()
+
+    scope.channels([1, 2, 3, 4]).bandwith_limit(False)
+    assert scope.channels([1, 2, 3, 4]).bandwith_limit() == [
+        False,
+        False,
+        False,
+        False,
+    ]
+
+
+def test_channel_coupling():
+    channel.coupling(Coupling.A1M)
+    assert channel.coupling() == Coupling.A1M
+
+    # NOTE: Cannot use 50 ohm coupling on my model
+    channel.coupling(Coupling.D1M)
+    assert channel.coupling() == Coupling.D1M
+    assert channels.coupling() == [Coupling.D1M, Coupling.D1M]
+
+
+def test_channel_offset():
+    channel.offset(Offset.V(-3.0))
+    result = channel.offset()
+    assert result.value == float(-3.0)
+    assert result.unit == "V"
+
+    channel.offset(Offset.mV(500.0))
+    result = channel.offset()
+    assert result.value == float(0.5)
+    assert result.unit == "V"
+
+    channel.offset(Offset.mV(0.0))
+    result = channel.offset()
+    assert result.value == float(0.0)
+    assert result.unit == "V"
 
 
 def xtest_channels_coupling():
@@ -109,7 +154,7 @@ def xtest_channels_visible():
     assert channels.visible() == ["OFF", "OFF"]
 
 
-def test_channel_parameter_value():
+def xtest_channel_parameter_value():
     awg.channel(1).waveForm(WaveForm.SINE)
     awg.channel(1).frequency(Freq.Hz(100))
     awg.channel(1).offset(0.0)

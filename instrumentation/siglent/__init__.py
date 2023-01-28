@@ -1,10 +1,9 @@
-from .scope import BWLimit, Commandable, Coupling, HeaderMode, Impedance, Scope
+from .channel import Coupling
+from .scope import Commandable, HeaderMode, Scope
 
 __all__ = [
     "Scope",
-    "BWLimit",
     "Coupling",
-    "Impedance",
     "Commandable",
     "HeaderMode",
 ]
