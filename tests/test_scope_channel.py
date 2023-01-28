@@ -8,6 +8,7 @@ from instrumentation.siglent.channel import (
     Attenuation,
     Coupling,
     Offset,
+    Skew,
     Value,
 )
 
@@ -78,6 +79,18 @@ def test_channel_offset():
     result = channel.offset()
     assert result.value == float(0.0)
     assert result.unit == "V"
+
+
+def test_channel_skew():
+    channel.skew(Skew.nS(-3.0))
+    result = channel.skew()
+    assert result.value == float("-3.0E-09")
+    assert result.unit == "S"
+
+    channel.skew(Skew.nS(0))
+    result = channel.skew()
+    assert result.value == float(0.0)
+    assert result.unit == "S"
 
 
 def xtest_channels_coupling():

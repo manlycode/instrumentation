@@ -46,6 +46,12 @@ class Offset(SIValue):
         return cls(value, "uV")
 
 
+class Skew(SIValue):
+    @classmethod
+    def nS(cls, value: float):
+        return cls(value, "NS")
+
+
 class Value(Enum):
     PKPK = auto()
     MAX = auto()
@@ -89,7 +95,7 @@ class Channel(Commandable):
         - [✅] BWL
         - [✅] CPL
         - [✅] OFST
-        - [ ] SKEW
+        - [✅] SKEW
         - [ ] TRA
         - [ ] UNIT
         - [ ] VDIV
@@ -218,6 +224,35 @@ class Channel(Commandable):
         else:
             res = self.query(f"{cmdRoot}?")
             return Offset.parse(res.val)
+
+    def skew(self, ns: Optional[Skew] = None) -> Optional[Skew]:
+        """
+        The SKEW command sets the channel-to-channel skew factor for the
+        specified channel. Each analog channel can be adjusted + or -100 ns for
+        a total of 200 ns difference between channels. You can use the
+        oscilloscope's skew control to remove cable-delay errors between
+        channels.
+
+        The SKEW? query returns the skew value of the specified trace.
+
+        Args:
+            ns (Optional[Skew], optional): Duration to skew channel.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Skew]: _description_
+        """
+        cmdRoot = f"{self.name}:SKEW"
+
+        if ns is not None:
+            cmd = f"{cmdRoot} {ns}"
+            self.write(cmd)
+            return None
+
+        else:
+            res = self.query(f"{cmdRoot}?")
+            return Skew.parse(res.val)
 
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"
