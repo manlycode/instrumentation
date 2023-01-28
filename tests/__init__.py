@@ -9,13 +9,13 @@ rm = ResourceManager()
 
 def build_awg() -> AWG:
     res = rm.open_resource(AWG.RESOURCE_ID)
-    res.baud_rate = AWG.BAUD_RATE
-    return AWG(res)
+    res.baud_rate = AWG.BAUD_RATE  # type: ignore
+    return AWG(res)  # type: ignore
 
 
 def build_scope() -> Scope:
     res = rm.open_resource(Scope.RESOURCE_ID)
-    return Scope(res)
+    return Scope(res)  # type: ignore
 
 
 awg = build_awg()

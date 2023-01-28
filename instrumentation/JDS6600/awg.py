@@ -58,31 +58,70 @@ class Channel:
         self.number = number
         self.resource = resource
 
-    def waveForm(self, wf: Optional[WaveForm] = None) -> Optional[str]:
-        cmdOffset = 0
-        result = None
+    def __dispatch(self, cmd: str) -> Optional[str]:
+        result = self.resource.query(f"{cmd}\r\n")
 
-        if wf is not None:
-            cmd = f":w2{self.number+cmdOffset}={wf.value}.\r\n"
-            self.resource.query(cmd)
+        if isinstance(result, str):
+            return result.strip()
 
         else:
-            cmd = f":r2{self.number+cmdOffset}=.\r\n"
-            self.resource.query(cmd)
-            result = self.resource.query(cmd).strip()
+            return result
 
-        return result
+    def waveForm(self, wf: Optional[WaveForm] = None) -> Optional[str]:
+        cmdOffset = 0
+        if wf is not None:
+            cmd = f":w2{self.number+cmdOffset}={wf.value}."
+
+        else:
+            cmd = f":r2{self.number+cmdOffset}=."
+
+        return self.__dispatch(cmd)
 
     def frequency(self, freq: Optional[Freq] = None) -> Optional[str]:
         cmdOffset = 2
         if freq is None:
             cmd = f":r2{self.number+cmdOffset}=."
-            return self.resource.query(cmd).strip()
 
         else:
-            cmd = f":w2{self.number+cmdOffset}={freq}.\n"
-            self.resource.query(cmd)
-            return None
+            cmd = f":w2{self.number+cmdOffset}={freq}."
+
+        return self.__dispatch(cmd)
+
+    def phase(self, degrees: Optional[float] = None):
+        if self.number == 1:
+            raise RuntimeError("Can't do that")
+
+        if degrees is not None:
+            value = int(degrees * 10)
+            cmd = f":w31={value}."
+
+        else:
+            cmd = ":r31=."
+
+        return self.__dispatch(cmd)
+
+    def amplitude(self, volts: Optional[float] = None):
+        cmdOffset = 4
+        if volts is not None:
+            value = int(volts * 1000.0)
+            cmd = f":w2{self.number+cmdOffset}={value}."
+
+        else:
+            cmd = f":r2{self.number+cmdOffset}=."
+
+        return self.__dispatch(cmd)
+
+    def offset(self, volts: Optional[float] = None):
+        cmdOffset = 6
+        if volts is not None:
+            value = 1000 + int((volts * 100.0))
+            cmd = f":w2{self.number+cmdOffset}={value}."
+            print(cmd)
+
+        else:
+            cmd = f":r2{self.number+cmdOffset}=."
+
+        return self.__dispatch(cmd)
 
 
 class ChannelList:
@@ -118,3 +157,9 @@ class AWG:
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
+
+    def print_all_values(self):
+        for x in range(int(100)):
+            cmd = f"r{x}=."
+            print(cmd)
+            print(self.resource.query(cmd))

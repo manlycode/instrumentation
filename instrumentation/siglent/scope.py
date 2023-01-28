@@ -1,7 +1,57 @@
-from enum import Enum
+from enum import Enum, auto
 from typing import Optional
 
 from pyvisa.resources.usb import USBInstrument
+
+from instrumentation.siglent.commandable import Commandable, Flag
+
+
+class ScopeId:
+    def __init__(self, response: str):
+        """
+        Initialized ScopeId
+
+        Args:
+            response (str): String response from *IDC? query
+        """
+        splitResponse = response.strip().split(",")
+        self.manufacturer = splitResponse[0]
+        self.model = splitResponse[1]
+        self.serial_num = splitResponse[2]
+        self.firmware = splitResponse[3]
+
+
+class HeaderMode(Enum):
+    SHORT = "SHORT"
+    LONG = "LONG"
+    OFF = "OFF"
+
+
+class Value(Enum):
+    PKPK = auto()
+    MAX = auto()
+    MIN = auto()
+    AMPL = auto()
+    TOP = auto()
+    BASE = auto()
+    CMEAN = auto()
+    MEAN = auto()
+    RMS = auto()
+    CRMS = auto()
+    OVSN = auto()
+    FPRE = auto()
+    OVSP = auto()
+    RPRE = auto()
+    PER = auto()
+    FREQ = auto()
+    PWID = auto()
+    NWID = auto()
+    RISE = auto()
+    FALL = auto()
+    WID = auto()
+    DUTY = auto()
+    NDUTY = auto()
+    ALL = auto()
 
 
 class BWLimit(Enum):
@@ -21,85 +71,72 @@ class Impedance(Enum):
     FIFTY = "FIFTy"
 
 
-class Flag(Enum):
-    ON = "ON"
-    OFF = "OFF"
+class Channel(Commandable):
+    """
+    The CHANNEL subsystem commands control the analog channels. Channels
+    areindependently programmable for offset, probe, coupling, bandwidth
+    limit, inversion, and more functions. The channel index (1, 2, 3, or 4)
+    specified in the command selects the analog channel that is affected by
+    the command.
 
-    @staticmethod
-    def fromBool(val: Optional[bool] = None):
-        if val is False:
-            return Flag.OFF
+    Args:
+        Commandable (_type_): _description_
 
-        if val is True:
-            return Flag.ON
+    TODO:
+        - [ ] ATTN
+        - [ ] BWL
+        - [ ] CPL
+        - [ ] OFST
+        - [ ] SKEW
+        - [ ] TRA
+        - [ ] UNIT
+        - [ ] VDIV
+        - [ ] INVS
 
-        return None
 
+    """
 
-class Channel:
     def __init__(self, number: int, resource) -> None:
         self.number = number
-        self.resource: USBInstrument = resource
         self.chanCmdRoot = f":CHANnel{self.number}"
-
-    def __dispatch_enum(self, cmdRoot: str, arg):
-        if arg is None:
-            return self.__dispatch_string(cmdRoot, None)
-
-        else:
-            return self.__dispatch_string(cmdRoot, arg.value)
-
-    def __dispatch_quoted_string(self, cmdRoot: str, arg):
-        if arg is None:
-            cmd = f"{cmdRoot}?"
-            return self.resource.query(cmd).rstrip().strip('"')
-
-        else:
-            cmd = f'{cmdRoot} "{arg}"'
-            self.resource.write(cmd)
-            return None
-
-    def __dispatch_string(self, cmdRoot: str, arg):
-        if arg is None:
-            cmd = f"{cmdRoot}?"
-            print(f"query.cmd: {cmd}")
-            return self.resource.query(cmd).rstrip()
-
-        else:
-            cmd = f"{cmdRoot} {arg}"
-            print(f"write.cmd: {cmd}")
-            print(self.resource.write(cmd))
-            return None
+        super().__init__(resource)
 
     def bwLimit(self, limit: Optional[BWLimit] = None) -> str:
         cmdRoot = f"{self.chanCmdRoot}:BWLimit"
-        return self.__dispatch_enum(cmdRoot, limit)
+        return self.dispatch_enum(cmdRoot, limit)
 
     def coupling(self, cpl: Optional[Coupling] = None):
         cmdRoot = f"{self.chanCmdRoot}:COUPling"
-        return self.__dispatch_enum(cmdRoot, cpl)
-
-    def impedance(self, imp: Optional[Impedance] = None):
-        # NOTE: doesn't work on SDS1104X-U
-        cmdRoot = f"{self.chanCmdRoot}:IMPedance"
-        return self.__dispatch_enum(cmdRoot, imp)
+        return self.dispatch_enum(cmdRoot, cpl)
 
     def invert(self, inv: Optional[bool] = None):
         cmdRoot = f"{self.chanCmdRoot}:INVert"
-        return self.__dispatch_enum(cmdRoot, Flag.fromBool(inv))
+        return self.dispatch_enum(cmdRoot, Flag.fromBool(inv))
 
     def label(self, state: Optional[bool] = None):
         cmdRoot = f"{self.chanCmdRoot}:LABel"
         flag = Flag.fromBool(state)
-        return self.__dispatch_enum(cmdRoot, flag)
+        return self.dispatch_enum(cmdRoot, flag)
 
     def labelText(self, label: Optional[str] = None):
         cmdRoot = f"{self.chanCmdRoot}:LABel:TEXT"
-        return self.__dispatch_quoted_string(cmdRoot, label)
+        return self.dispatch_quoted_string(cmdRoot, label)
 
     def visible(self, state: Optional[bool] = None):
         cmdRoot = f"{self.chanCmdRoot}:VIS"
-        return self.__dispatch_enum(cmdRoot, Flag.fromBool(state))
+        return self.dispatch_enum(cmdRoot, Flag.fromBool(state))
+
+    def switch(self, state: Optional[bool] = None):
+        cmdRoot = f"{self.chanCmdRoot}:SWITch"
+        return self.dispatch_enum(cmdRoot, Flag.fromBool(state))
+
+    def parameter_value(self, value: Value):
+        cmd = f":C{self.number}:PARAMETER_VALUE? {value.name}"
+        result = self.resource.query(cmd)
+        split_result = str.split(result, ",")[1]
+        print(split_result)
+
+        return self.resource.query(cmd)
 
 
 class ChannelList:
@@ -114,9 +151,6 @@ class ChannelList:
     def coupling(self, cpl: Optional[Coupling] = None) -> list[str]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
 
-    def impedance(self, imp: Optional[Impedance] = None) -> list[str]:
-        return list(map(lambda x: x.impedance(imp), self.channels))
-
     def invert(self, inv: Optional[bool] = None) -> list[str]:
         return list(map(lambda x: x.invert(inv), self.channels))
 
@@ -127,14 +161,43 @@ class ChannelList:
         return list(map(lambda x: x.labelText(label), self.channels))
 
     def visible(self, vis: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.invert(vis), self.channels))
+        return list(map(lambda x: x.visible(vis), self.channels))
+
+    def switch(self, state: Optional[bool] = None) -> list[str]:
+        return list(map(lambda x: x.switch(state), self.channels))
 
 
-class Scope:
+class Scope(Commandable):
+    """
+    Root object for
+
+    Args:
+        Commandable (_type_): _description_
+
+    Returns:
+        _type_: _description_
+
+    TODO:
+        - [✅] *IDN?(IdentificationNumber)
+        - [✅] *OPC(OperationComplete)
+        - [✅] *RST(Reset)
+        (Pg. 18)
+
+        - [ ] SCDP
+        (Pg. 148)
+
+        - [ ] *RCL
+        - [ ] RCPN
+        (Pg. 150)
+
+        - [ ] INR? (Page 174)
+
+    """
+
     RESOURCE_ID = "USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR"
 
     def __init__(self, resource: USBInstrument) -> None:
-        self.resource = resource
+        super().__init__(resource)
 
     def write(self, msg: str):
         self.resource.write(msg)
@@ -147,3 +210,56 @@ class Scope:
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
+
+    def comm_header(self, mode: Optional[HeaderMode] = None) -> str:
+        return super().dispatch_enum("CHDR", mode)
+
+    def auto_setup(self):
+        super().write("ASET")
+
+    def idn(self) -> ScopeId:
+        """
+        The *IDN? query identifies the instrument type and software version.
+        The response consists of four different fields providing information
+        on the manufacturer, the scope model, the serial number and the
+        firmware revision.
+
+        Returns:
+            ScopeId: Identifying information for a scope
+        """
+        res = super().query("*IDN?")
+        return ScopeId(res)
+
+    def opc(self, isCommand: bool = False) -> Optional[int]:
+        """
+        The *OPC command sets the operation complete bit in the Standard Event
+        Status Register when all pending device operations have finished.
+
+        The *OPC? query places an ASCII "1" in the output queue when all
+        pending device operations have completed. The interface hangs until
+        this query returns.
+
+        Args:
+            isCommand (bool, optional): Set to true to send as a command. Set
+            to false to send as a query.
+
+            Defaults to False.
+
+        Returns:
+            Optional[int]: Result of query when sent as query.
+        """
+        cmd = "*OPC"
+        if isCommand:
+            super().write(cmd)
+            return None
+
+        else:
+            res = super().query(f"{cmd}?").strip()
+            return int(res)
+
+    def reset(self):
+        """
+        The *RST command initiates a device reset. This is the same as pressing
+        `Default` on the front panel.
+        """
+        return self.resource.write("*RST")
