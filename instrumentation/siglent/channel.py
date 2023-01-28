@@ -80,7 +80,7 @@ class Channel(Commandable):
 
     TODO:
         - [✅] ATTN
-        - [ ] BWL
+        - [✅] BWL
         - [ ] CPL
         - [ ] OFST
         - [ ] SKEW
@@ -88,13 +88,11 @@ class Channel(Commandable):
         - [ ] UNIT
         - [ ] VDIV
         - [ ] INVS
-
-
     """
 
     def __init__(self, number: int, resource) -> None:
         self.number = number
-        self.cmdRoot = f"C{self.number}"
+        self.name = f"C{self.number}"
         super().__init__(resource)
 
     def attenuation(
@@ -119,7 +117,7 @@ class Channel(Commandable):
         Returns:
             Optional[Attenuation]: _description_
         """
-        cmd = f"{self.cmdRoot}:ATTENUATION"
+        cmd = f"{self.name}:ATTN"
         res = self.dispatch_enum(cmd, attn)
 
         if attn is not None:
@@ -129,33 +127,64 @@ class Channel(Commandable):
             resVal = res.strip().split(" ")[1]
             return Attenuation(resVal)
 
-    def bwLimit(self, limit: Optional[BWLimit] = None) -> str:
-        cmd = f"{self.cmdRoot}:BWLimit"
-        return self.dispatch_enum(cmd, limit)
+    def bandwith_limit(self, state: Optional[bool] = None) -> Optional[bool]:
+        """
+        BANDWIDTH_LIMIT enables or disables the bandwidth- limiting low-pass
+        filter. If the bandwidth filters are on, it will limit the bandwidth to
+        reduce display noise. When you turn Bandwidth Limit ON, the Bandwidth
+        Limit value is set to 20 MHz. It also filters the signal to reduce
+        noise and other unwanted high frequency components.
+
+        The BANDWIDTH_LIMIT? query returns whether the bandwidth filters are
+        on.
+
+        Args:
+            state (Optional[bool], optional):
+                - `True` sets the bandwith limit to `20M`.
+                - `False` sets the bandwith limit to `FULL`.
+                - `None` queries the bandwith limit for the given channel.
+
+        Returns:
+            bool: Bandwith mode of the given channel when queried.
+                - `True`: Bandwith limit == `20M`.
+                - `False`: Bandwith limit == `FULL`.
+        """
+        cmd = "BWL"
+        if state is not None:
+            self.write(f"{cmd} {self.name},{Flag.fromBool(state).value}")
+            return None
+
+        else:
+            res = self.query(f"{cmd}?")
+            resArray = res.split(" ")[1].split(",")
+            idx = (2 * (self.number - 1)) + 1
+            flagValue = resArray[idx].strip()
+
+            return Flag(flagValue).toBool()
 
     def coupling(self, cpl: Optional[Coupling] = None):
-        cmd = f"{self.cmdRoot}:COUPling"
+        cmd = f"{self.name}:COUPling"
         return self.dispatch_enum(cmd, cpl)
 
     def invert(self, inv: Optional[bool] = None):
-        cmd = f"{self.cmdRoot}:INVert"
+        cmd = f"{self.name}:INVert"
         return self.dispatch_enum(cmd, Flag.fromBool(inv))
 
     def label(self, state: Optional[bool] = None):
-        cmd = f"{self.cmdRoot}:LABel"
+        cmd = f"{self.name}:LABel"
         flag = Flag.fromBool(state)
         return self.dispatch_enum(cmd, flag)
 
     def labelText(self, label: Optional[str] = None):
-        cmd = f"{self.cmdRoot}:LABel:TEXT"
+        cmd = f"{self.name}:LABel:TEXT"
         return self.dispatch_quoted_string(cmd, label)
 
     def visible(self, state: Optional[bool] = None):
-        cmd = f"{self.cmdRoot}:VIS"
+        cmd = f"{self.name}:VIS"
         return self.dispatch_enum(cmd, Flag.fromBool(state))
 
     def switch(self, state: Optional[bool] = None):
-        cmd = f"{self.cmdRoot}:SWITch"
+        cmd = f"{self.name}:SWITch"
         return self.dispatch_enum(cmd, Flag.fromBool(state))
 
     def parameter_value(self, value: Value):
@@ -172,9 +201,6 @@ class ChannelList:
         self.channels: list[Channel] = list(
             map(lambda x: Channel(x, resource), numbers)
         )
-
-    def bwLimit(self, limit: Optional[BWLimit] = None) -> list[str]:
-        return list(map(lambda x: x.bwLimit(limit), self.channels))
 
     def coupling(self, cpl: Optional[Coupling] = None) -> list[str]:
         return list(map(lambda x: x.coupling(cpl), self.channels))

@@ -18,6 +18,12 @@ class Flag(Enum):
 
         return None
 
+    def toBool(self) -> bool:
+        if self == Flag.ON:
+            return True
+        else:
+            return False
+
 
 class Commandable:
     def __init__(self, resource) -> None:
@@ -49,11 +55,9 @@ class Commandable:
     def __dispatch_string(self, cmdRoot: str, arg):
         if arg is None:
             cmd = f"{cmdRoot}?"
-            print(f"query.cmd: {cmd}")
             return self.resource.query(cmd).rstrip()
 
         else:
             cmd = f"{cmdRoot} {arg}"
-            print(f"write.cmd: {cmd}")
-            print(self.resource.write(cmd))
+            self.resource.write(cmd)
             return None

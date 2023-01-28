@@ -23,20 +23,34 @@ def test_channel_attenuation():
     assert channel.attenuation() == Attenuation._1
 
 
-def xtest_channel_bwLimit():
-    channel.bwLimit(BWLimit.BWL_200M)
-    assert channel.bwLimit() == "FULL"
+def test_channel_bandwith_limit():
+    scope.reset()
+    sleep(2)
 
-    channel.bwLimit(BWLimit.BWL_20M)
-    assert channel.bwLimit() == "20M"
+    assert scope.channel(1).bandwith_limit() is False
+    assert scope.channel(2).bandwith_limit() is False
+    assert scope.channel(3).bandwith_limit() is False
+    assert scope.channel(4).bandwith_limit() is False
 
+    scope.channel(1).bandwith_limit(True)
+    scope.channel(2).bandwith_limit(True)
+    scope.channel(3).bandwith_limit(True)
+    scope.channel(4).bandwith_limit(True)
 
-def xtest_channels_bwLimit():
-    channels.bwLimit(BWLimit.BWL_200M)
-    assert channels.bwLimit() == ["FULL", "FULL"]
+    assert scope.channel(1).bandwith_limit()
+    assert scope.channel(2).bandwith_limit()
+    assert scope.channel(3).bandwith_limit()
+    assert scope.channel(4).bandwith_limit()
 
-    channels.bwLimit(BWLimit.BWL_20M)
-    assert channels.bwLimit() == ["20M", "20M"]
+    scope.channel(1).bandwith_limit(False)
+    scope.channel(2).bandwith_limit(False)
+    scope.channel(3).bandwith_limit(False)
+    scope.channel(4).bandwith_limit(False)
+
+    assert scope.channel(1).bandwith_limit() is False
+    assert scope.channel(2).bandwith_limit() is False
+    assert scope.channel(3).bandwith_limit() is False
+    assert scope.channel(4).bandwith_limit() is False
 
 
 def xtest_channel_coupling():
