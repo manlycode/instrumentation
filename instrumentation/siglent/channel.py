@@ -23,12 +23,6 @@ class Attenuation(Enum):
     _10000 = "10000"
 
 
-class BWLimit(Enum):
-    BWL_20M = "20M"
-    BWL_200M = "200M"
-    BWL_FULL = "FULL"
-
-
 class Coupling(Enum):
     AC = "AC"
     DC = "DC"
@@ -201,6 +195,11 @@ class ChannelList:
         self.channels: list[Channel] = list(
             map(lambda x: Channel(x, resource), numbers)
         )
+
+    def bandwith_limit(
+        self, state: Optional[bool] = None
+    ) -> list[Optional[bool]]:
+        return list(map(lambda x: x.bandwith_limit(state), self.channels))
 
     def coupling(self, cpl: Optional[Coupling] = None) -> list[str]:
         return list(map(lambda x: x.coupling(cpl), self.channels))

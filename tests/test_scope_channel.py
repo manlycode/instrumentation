@@ -6,7 +6,6 @@ import pytest
 from tests import awg, scope
 from instrumentation.siglent.channel import (
     Attenuation,
-    BWLimit,
     Coupling,
     Value,
 )
@@ -42,15 +41,13 @@ def test_channel_bandwith_limit():
     assert scope.channel(3).bandwith_limit()
     assert scope.channel(4).bandwith_limit()
 
-    scope.channel(1).bandwith_limit(False)
-    scope.channel(2).bandwith_limit(False)
-    scope.channel(3).bandwith_limit(False)
-    scope.channel(4).bandwith_limit(False)
-
-    assert scope.channel(1).bandwith_limit() is False
-    assert scope.channel(2).bandwith_limit() is False
-    assert scope.channel(3).bandwith_limit() is False
-    assert scope.channel(4).bandwith_limit() is False
+    scope.channels([1, 2, 3, 4]).bandwith_limit(False)
+    assert scope.channels([1, 2, 3, 4]).bandwith_limit() == [
+        False,
+        False,
+        False,
+        False,
+    ]
 
 
 def xtest_channel_coupling():

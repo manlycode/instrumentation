@@ -5,7 +5,7 @@ import pyvisa
 from instrumentation.JDS6600.awg import Freq
 
 from ..JDS6600 import AWG, WaveForm
-from ..siglent import BWLimit, Coupling, Scope
+from ..siglent import Coupling, Scope
 
 
 def runScript():
@@ -26,7 +26,6 @@ def runScript():
     scope_channels = scope.channels([1, 2])
 
     scope_channels.switch(True)
-    scope_channels.bwLimit(BWLimit.BWL_20M)
     scope_channels.coupling(Coupling.AC)
 
     # Setup Waves
