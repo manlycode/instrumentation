@@ -1,4 +1,5 @@
-from .scope import BWLimit, Commandable, Coupling, HeaderMode, Impedance, Scope
+from .channel import BWLimit, Coupling, Impedance
+from .scope import Commandable, HeaderMode, Scope
 
 __all__ = [
     "Scope",
