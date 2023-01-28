@@ -31,11 +31,6 @@ class Coupling(Enum):
     GND = "GND"
 
 
-class Impedance(Enum):
-    ONE_MEG = "ONEMeg"
-    FIFTY = "FIFTy"
-
-
 class Value(Enum):
     PKPK = auto()
     MAX = auto()
