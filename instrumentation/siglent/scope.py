@@ -168,7 +168,8 @@ class ChannelList:
 
 
 class Scope(Commandable):
-    """_summary_
+    """
+    Root object for
 
     Args:
         Commandable (_type_): _description_
@@ -179,7 +180,7 @@ class Scope(Commandable):
     TODO:
         - [✅] *IDN?(IdentificationNumber)
         - [✅] *OPC(OperationComplete)
-        - [ ] *RST(Reset)
+        - [✅] *RST(Reset)
         (Pg. 18)
 
         - [ ] SCDP
@@ -201,8 +202,7 @@ class Scope(Commandable):
     def write(self, msg: str):
         self.resource.write(msg)
 
-    def reset(self):
-        return self.resource.write("*RST")
+
 
     def query(self, msg: str) -> str:
         return self.resource.query(msg)
@@ -258,3 +258,10 @@ class Scope(Commandable):
         else:
             res = super().query(f"{cmd}?").strip()
             return int(res)
+
+    def reset(self):
+        """
+        The *RST command initiates a device reset. This is the same as pressing
+        `Default` on the front panel.
+        """
+        return self.resource.write("*RST")

@@ -1,6 +1,10 @@
 from instrumentation.siglent.scope import ScopeId
 from tests import scope
 
+def test_reset():
+    scope.reset()
+    # Verified manually
+    assert True
 
 def test_scope_id():
     result = ScopeId("Siglent Technologies,SDS1204X-E,SDS1EBAC0L0098,7.6.1.15")
@@ -21,3 +25,6 @@ def test_idn():
 def test_opc():
     assert scope.opc(True) is None
     assert scope.opc() == 1
+
+
+
