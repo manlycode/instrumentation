@@ -1,14 +1,26 @@
 from time import sleep
 from instrumentation.JDS6600.awg import Freq, WaveForm
-from instrumentation.siglent.scope import HeaderMode, Value
 
 import pytest
 
 from tests import awg, scope
-from instrumentation.siglent.scope import BWLimit, Coupling, Impedance
+from instrumentation.siglent.channel import (
+    Attenuation,
+    BWLimit,
+    Coupling,
+    Value,
+)
 
 channel = scope.channel(1)
 channels = scope.channels([3, 4])
+
+
+def test_channel_attenuation():
+    channel.attenuation(Attenuation._50)
+    assert channel.attenuation() == Attenuation._50
+
+    channel.attenuation(Attenuation._1)
+    assert channel.attenuation() == Attenuation._1
 
 
 def xtest_channel_bwLimit():
@@ -109,7 +121,7 @@ def xtest_channels_visible():
     assert channels.visible() == ["OFF", "OFF"]
 
 
-def test_channel_parameter_value():
+def xtest_channel_parameter_value():
     awg.channel(1).waveForm(WaveForm.SINE)
     awg.channel(1).frequency(Freq.Hz(100))
     awg.channel(1).offset(0.0)

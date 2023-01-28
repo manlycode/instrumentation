@@ -4,6 +4,25 @@ from typing import Optional
 from instrumentation.siglent.commandable import Commandable, Flag
 
 
+class Attenuation(Enum):
+    _0_1 = "0.1"
+    _0_2 = "0.2"
+    _0_5 = "0.5"
+    _1 = "1"
+    _2 = "2"
+    _5 = "5"
+    _10 = "10"
+    _20 = "20"
+    _50 = "50"
+    _100 = "100"
+    _200 = "200"
+    _500 = "500"
+    _1000 = "1000"
+    _2000 = "2000"
+    _5000 = "5000"
+    _10000 = "10000"
+
+
 class BWLimit(Enum):
     BWL_20M = "20M"
     BWL_200M = "200M"
@@ -60,7 +79,7 @@ class Channel(Commandable):
         Commandable (_type_): _description_
 
     TODO:
-        - [ ] ATTN
+        - [✅] ATTN
         - [ ] BWL
         - [ ] CPL
         - [ ] OFST
@@ -75,37 +94,69 @@ class Channel(Commandable):
 
     def __init__(self, number: int, resource) -> None:
         self.number = number
-        self.chanCmdRoot = f":CHANnel{self.number}"
+        self.cmdRoot = f"C{self.number}"
         super().__init__(resource)
 
+    def attenuation(
+        self, attn: Optional[Attenuation] = None
+    ) -> Optional[Attenuation]:
+        """
+        The ATTENUATION command specifies the probe attenuation factor for the
+        selected channel. The probe attenuation factor may be 0.1 to 10000.
+
+        This command does not change the actual input sensitivity of the
+        oscilloscope. It changes the reference constants for scaling the
+        display factors, for making automatic measurements, and for setting
+        trigger levels.
+
+        The ATTENUATION? query returns the current probe attenuation factor for
+        the selected channel.
+
+        Args:
+            attn (Optional[Attenuation], optional): _description_. Defaults to
+            None.
+
+        Returns:
+            Optional[Attenuation]: _description_
+        """
+        cmd = f"{self.cmdRoot}:ATTENUATION"
+        res = self.dispatch_enum(cmd, attn)
+
+        if attn is not None:
+            return None
+
+        else:
+            resVal = res.strip().split(" ")[1]
+            return Attenuation(resVal)
+
     def bwLimit(self, limit: Optional[BWLimit] = None) -> str:
-        cmdRoot = f"{self.chanCmdRoot}:BWLimit"
-        return self.dispatch_enum(cmdRoot, limit)
+        cmd = f"{self.cmdRoot}:BWLimit"
+        return self.dispatch_enum(cmd, limit)
 
     def coupling(self, cpl: Optional[Coupling] = None):
-        cmdRoot = f"{self.chanCmdRoot}:COUPling"
-        return self.dispatch_enum(cmdRoot, cpl)
+        cmd = f"{self.cmdRoot}:COUPling"
+        return self.dispatch_enum(cmd, cpl)
 
     def invert(self, inv: Optional[bool] = None):
-        cmdRoot = f"{self.chanCmdRoot}:INVert"
-        return self.dispatch_enum(cmdRoot, Flag.fromBool(inv))
+        cmd = f"{self.cmdRoot}:INVert"
+        return self.dispatch_enum(cmd, Flag.fromBool(inv))
 
     def label(self, state: Optional[bool] = None):
-        cmdRoot = f"{self.chanCmdRoot}:LABel"
+        cmd = f"{self.cmdRoot}:LABel"
         flag = Flag.fromBool(state)
-        return self.dispatch_enum(cmdRoot, flag)
+        return self.dispatch_enum(cmd, flag)
 
     def labelText(self, label: Optional[str] = None):
-        cmdRoot = f"{self.chanCmdRoot}:LABel:TEXT"
-        return self.dispatch_quoted_string(cmdRoot, label)
+        cmd = f"{self.cmdRoot}:LABel:TEXT"
+        return self.dispatch_quoted_string(cmd, label)
 
     def visible(self, state: Optional[bool] = None):
-        cmdRoot = f"{self.chanCmdRoot}:VIS"
-        return self.dispatch_enum(cmdRoot, Flag.fromBool(state))
+        cmd = f"{self.cmdRoot}:VIS"
+        return self.dispatch_enum(cmd, Flag.fromBool(state))
 
     def switch(self, state: Optional[bool] = None):
-        cmdRoot = f"{self.chanCmdRoot}:SWITch"
-        return self.dispatch_enum(cmdRoot, Flag.fromBool(state))
+        cmd = f"{self.cmdRoot}:SWITch"
+        return self.dispatch_enum(cmd, Flag.fromBool(state))
 
     def parameter_value(self, value: Value):
         cmd = f":C{self.number}:PARAMETER_VALUE? {value.name}"
