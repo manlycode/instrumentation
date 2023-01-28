@@ -52,12 +52,14 @@ def test_channel_bandwith_limit():
     ]
 
 
-def xtest_channel_coupling():
-    channel.coupling(Coupling.AC)
-    assert channel.coupling() == "AC"
+def test_channel_coupling():
+    channel.coupling(Coupling.A1M)
+    assert channel.coupling() == Coupling.A1M
 
-    channel.coupling(Coupling.DC)
-    assert channel.coupling() == "DC"
+    # NOTE: Cannot use 50 ohm coupling on my model
+    channel.coupling(Coupling.D1M)
+    assert channel.coupling() == Coupling.D1M
+    assert channels.coupling() == [Coupling.D1M, Coupling.D1M]
 
 
 def xtest_channels_coupling():

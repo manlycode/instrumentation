@@ -24,8 +24,10 @@ class Attenuation(Enum):
 
 
 class Coupling(Enum):
-    AC = "AC"
-    DC = "DC"
+    A1M = "A1M"
+    A50 = "A50"
+    D1M = "D1M"
+    D50 = "D50"
     GND = "GND"
 
 
@@ -75,7 +77,7 @@ class Channel(Commandable):
     TODO:
         - [✅] ATTN
         - [✅] BWL
-        - [ ] CPL
+        - [✅] CPL
         - [ ] OFST
         - [ ] SKEW
         - [ ] TRA
@@ -156,9 +158,30 @@ class Channel(Commandable):
 
             return Flag(flagValue).toBool()
 
-    def coupling(self, cpl: Optional[Coupling] = None):
-        cmd = f"{self.name}:COUPling"
-        return self.dispatch_enum(cmd, cpl)
+    def coupling(self, cpl: Optional[Coupling] = None) -> Optional[Coupling]:
+        """
+        The COUPLING command selects the coupling mode of the specified input
+        channel.
+
+        The COUPLING? query returns the coupling mode of the specified channel.
+
+        Args:
+            cpl (Optional[Coupling], optional): Coupling to set.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Coupling]: Coupling of the channel
+        """
+        cmd = f"{self.name}:CPL"
+        res = self.dispatch_enum(cmd, cpl)
+
+        if res is not None:
+            val = res.split(" ")[1]
+            return Coupling(val)
+
+        else:
+            return None
 
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"
@@ -206,7 +229,9 @@ class ChannelList:
     ) -> list[Optional[bool]]:
         return list(map(lambda x: x.bandwith_limit(state), self.channels))
 
-    def coupling(self, cpl: Optional[Coupling] = None) -> list[str]:
+    def coupling(
+        self, cpl: Optional[Coupling] = None
+    ) -> list[Optional[Coupling]]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
 
     def invert(self, inv: Optional[bool] = None) -> list[str]:
