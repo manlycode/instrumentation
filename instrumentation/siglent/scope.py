@@ -6,6 +6,15 @@ from pyvisa.resources.usb import USBInstrument
 from instrumentation.siglent.commandable import Commandable, Flag
 
 
+class ScopeId:
+    def __init__(self, response: str) -> None:
+        splitResponse = response.strip().split(",")
+        self.manufacturer = splitResponse[0]
+        self.model = splitResponse[1]
+        self.serial_num = splitResponse[2]
+        self.firmware = splitResponse[3]
+
+
 class HeaderMode(Enum):
     SHORT = "SHORT"
     LONG = "LONG"
@@ -162,7 +171,7 @@ class Scope(Commandable):
         _type_: _description_
 
     TODO:
-        - [ ] *IDN?(IdentificationNumber)
+        - [✅] *IDN?(IdentificationNumber)
         - [ ] *OPC(OperationComplete)
         - [ ] *RST(Reset)
         (Pg. 18)
@@ -203,3 +212,8 @@ class Scope(Commandable):
 
     def auto_setup(self):
         super().write("ASET")
+
+    def idn(self) -> ScopeId:
+        res = super().query("*IDN?")
+        print(res)
+        return ScopeId(res)
