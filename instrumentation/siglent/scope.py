@@ -63,17 +63,20 @@ class Scope(Commandable):
     def write(self, msg: str):
         self.resource.write(msg)
 
-    def query(self, msg: str) -> str:
-        return self.resource.query(msg)
-
     def channel(self, number: int) -> Channel:
         return Channel(number, self.resource)
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
 
-    def comm_header(self, mode: Optional[HeaderMode] = None) -> str:
-        return super().dispatch_enum("CHDR", mode)
+    def comm_header(self, mode: Optional[HeaderMode] = None) -> Optional[str]:
+        res = super().dispatch_enum("CHDR", mode)
+
+        if res is not None:
+            return res.val
+
+        else:
+            return None
 
     def auto_setup(self):
         super().write("ASET")
@@ -88,7 +91,7 @@ class Scope(Commandable):
         Returns:
             ScopeId: Identifying information for a scope
         """
-        res = super().query("*IDN?")
+        res = self.resource.query("*IDN?")
         return ScopeId(res)
 
     def opc(self, isCommand: bool = False) -> Optional[int]:
@@ -110,12 +113,13 @@ class Scope(Commandable):
             Optional[int]: Result of query when sent as query.
         """
         cmd = "*OPC"
+
         if isCommand:
             super().write(cmd)
             return None
 
         else:
-            res = super().query(f"{cmd}?").strip()
+            res = self.resource.query(f"{cmd}?")
             return int(res)
 
     def reset(self):

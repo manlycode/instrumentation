@@ -31,6 +31,27 @@ class Coupling(Enum):
     GND = "GND"
 
 
+class Offset:
+    def __init__(self, value: int, unit: str = "V") -> None:
+        self.value = value
+        self.unit = unit
+
+    def __str__(self) -> str:
+        return f"{self.value}{self.unit}"
+
+    @classmethod
+    def V(cls, value: int):
+        return cls(value, "V")
+
+    @classmethod
+    def mV(cls, value: int):
+        return cls(value, "mV")
+
+    @classmethod
+    def uV(cls, value: int):
+        return cls(value, "uV")
+
+
 class Value(Enum):
     PKPK = auto()
     MAX = auto()
@@ -111,12 +132,11 @@ class Channel(Commandable):
         cmd = f"{self.name}:ATTN"
         res = self.dispatch_enum(cmd, attn)
 
-        if attn is not None:
+        if res is None:
             return None
 
         else:
-            resVal = res.strip().split(" ")[1]
-            return Attenuation(resVal)
+            return Attenuation(res.val)
 
     def bandwith_limit(self, state: Optional[bool] = None) -> Optional[bool]:
         """
@@ -147,7 +167,7 @@ class Channel(Commandable):
 
         else:
             res = self.query(f"{cmd}?")
-            resArray = res.split(" ")[1].split(",")
+            resArray = res.val.split(",")
             idx = (2 * (self.number - 1)) + 1
             flagValue = resArray[idx].strip()
 
@@ -172,11 +192,22 @@ class Channel(Commandable):
         res = self.dispatch_enum(cmd, cpl)
 
         if res is not None:
-            val = res.split(" ")[1]
-            return Coupling(val)
+            return Coupling(res.val)
 
         else:
             return None
+
+    def offset(self, offset: Optional[Offset]) -> Optional[str]:
+        cmdRoot = f"{self.name}:OFST"
+
+        if offset is not None:
+            cmd = f"{cmdRoot} {offset}"
+            self.write(cmd)
+            return None
+
+        else:
+            res = self.query(cmdRoot)
+            return res.val
 
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"

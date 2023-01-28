@@ -7,6 +7,7 @@ from tests import awg, scope
 from instrumentation.siglent.channel import (
     Attenuation,
     Coupling,
+    Offset,
     Value,
 )
 
@@ -60,6 +61,12 @@ def test_channel_coupling():
     channel.coupling(Coupling.D1M)
     assert channel.coupling() == Coupling.D1M
     assert channels.coupling() == [Coupling.D1M, Coupling.D1M]
+
+
+def test_channel_offset():
+    channel.offset(Offset.V(-3))
+    channel.offset(Offset.uV(500))
+    channel.offset(Offset.mV(0))
 
 
 def xtest_channels_coupling():
