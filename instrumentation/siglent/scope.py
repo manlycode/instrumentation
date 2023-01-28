@@ -178,7 +178,7 @@ class Scope(Commandable):
 
     TODO:
         - [✅] *IDN?(IdentificationNumber)
-        - [ ] *OPC(OperationComplete)
+        - [✅] *OPC(OperationComplete)
         - [ ] *RST(Reset)
         (Pg. 18)
 
@@ -230,5 +230,31 @@ class Scope(Commandable):
             ScopeId: Identifying information for a scope
         """
         res = super().query("*IDN?")
-        print(res)
         return ScopeId(res)
+
+    def opc(self, isCommand: bool = False) -> Optional[int]:
+        """
+        The *OPC command sets the operation complete bit in the Standard Event
+        Status Register when all pending device operations have finished.
+
+        The *OPC? query places an ASCII "1" in the output queue when all
+        pending device operations have completed. The interface hangs until
+        this query returns.
+
+        Args:
+            isCommand (bool, optional): Set to true to send as a command. Set
+            to false to send as a query.
+
+            Defaults to False.
+
+        Returns:
+            Optional[int]: Result of query when sent as query.
+        """
+        cmd = "*OPC"
+        if isCommand:
+            super().write(cmd)
+            return None
+
+        else:
+            res = super().query(f"{cmd}?").strip()
+            return int(res)

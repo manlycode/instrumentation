@@ -16,3 +16,8 @@ def test_idn():
     assert result.model == "SDS1104X-U"
     assert result.serial_num == "SDSAHBAQ6R1188"
     assert result.firmware == "2.1.1.1.5R6"
+
+
+def test_opc():
+    assert scope.opc(True) is None
+    assert scope.opc() == 1
