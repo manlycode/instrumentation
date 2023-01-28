@@ -96,7 +96,7 @@ class Channel(Commandable):
         - [✅] CPL
         - [✅] OFST
         - [✅] SKEW
-        - [ ] TRA
+        - [✅] TRA
         - [ ] UNIT
         - [ ] VDIV
         - [ ] INVS
@@ -254,6 +254,32 @@ class Channel(Commandable):
             res = self.query(f"{cmdRoot}?")
             return Skew.parse(res.val)
 
+    def trace(self, state: Optional[bool] = None) -> Optional[bool]:
+        """
+        The TRACE command turns the display of the specified channel on or off.
+
+        The TRACE? query returns the current display setting for the specified
+        channel.
+
+        Args:
+            state (Optional[bool], optional):
+                - `True` turns the channelon.
+                - `False` turns the cnannel off.
+                - `None` returns the state of the channel.
+
+            Defaults to None.
+
+        Returns:
+            Optional[bool]: _description_
+        """
+        cmd = f"{self.name}:TRA"
+        res = self.dispatch_enum(cmd, Flag.fromBool(state))
+
+        if res is not None:
+            return Flag(res.val).toBool()
+
+        return None
+
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"
         return self.dispatch_enum(cmd, Flag.fromBool(inv))
@@ -269,10 +295,6 @@ class Channel(Commandable):
 
     def visible(self, state: Optional[bool] = None):
         cmd = f"{self.name}:VIS"
-        return self.dispatch_enum(cmd, Flag.fromBool(state))
-
-    def switch(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:SWITch"
         return self.dispatch_enum(cmd, Flag.fromBool(state))
 
     def parameter_value(self, value: Value):
@@ -305,6 +327,9 @@ class ChannelList:
     ) -> list[Optional[Coupling]]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
 
+    def trace(self, state: Optional[bool] = None) -> list[Optional[bool]]:
+        return list(map(lambda x: x.trace(state), self.channels))
+
     def invert(self, inv: Optional[bool] = None) -> list[str]:
         return list(map(lambda x: x.invert(inv), self.channels))
 
@@ -316,6 +341,3 @@ class ChannelList:
 
     def visible(self, vis: Optional[bool] = None) -> list[str]:
         return list(map(lambda x: x.visible(vis), self.channels))
-
-    def switch(self, state: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.switch(state), self.channels))

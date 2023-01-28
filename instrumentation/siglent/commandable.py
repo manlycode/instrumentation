@@ -63,6 +63,7 @@ class Commandable:
         if arg is None:
             cmd = f"{cmdRoot}?"
             res = self.resource.query(cmd)
+
             return Response(res)
 
         else:

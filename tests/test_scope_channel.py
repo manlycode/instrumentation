@@ -93,6 +93,14 @@ def test_channel_skew():
     assert result.unit == "S"
 
 
+def test_channel_trace():
+    channel.trace(True)
+    assert channel.trace()
+
+    channel.trace(False)
+    assert channel.trace() is False
+
+
 def xtest_channels_coupling():
     channels.coupling(Coupling.AC)
     assert channels.coupling() == ["AC", "AC"]
@@ -149,14 +157,6 @@ def xtest_channels_labelText():
 
     channels.labelText("B")
     assert channels.labelText() == ["B", "B"]
-
-
-def xtest_channel_visible():
-    channel.visible(True)
-    assert channel.visible() == "ON"
-
-    channel.visible(False)
-    assert channel.visible() == "OFF"
 
 
 def xtest_channels_visible():
