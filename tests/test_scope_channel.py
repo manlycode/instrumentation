@@ -9,6 +9,7 @@ from instrumentation.siglent.channel import (
     Coupling,
     Offset,
     Skew,
+    Unit,
     Value,
 )
 
@@ -99,6 +100,14 @@ def test_channel_trace():
 
     channel.trace(False)
     assert channel.trace() is False
+
+
+def test_channel_unit():
+    channel.unit(Unit.A)
+    assert channel.unit() == Unit.A
+
+    channel.unit(Unit.V)
+    assert channel.unit() == Unit.V
 
 
 def xtest_channels_coupling():

@@ -52,6 +52,11 @@ class Skew(SIValue):
         return cls(value, "NS")
 
 
+class Unit(Enum):
+    V = "V"
+    A = "A"
+
+
 class Value(Enum):
     PKPK = auto()
     MAX = auto()
@@ -97,7 +102,7 @@ class Channel(Commandable):
         - [✅] OFST
         - [✅] SKEW
         - [✅] TRA
-        - [ ] UNIT
+        - [✅] UNIT
         - [ ] VDIV
         - [ ] INVS
     """
@@ -277,6 +282,30 @@ class Channel(Commandable):
 
         if res is not None:
             return Flag(res.val).toBool()
+
+        return None
+
+    def unit(self, unit: Optional[Unit] = None) -> Optional[Unit]:
+        """
+        The UNIT command sets the unit of the specified trace. Measurement
+        results, channel sensitivity, and trigger level will reflect the
+        measurement units you select.
+
+        The UNIT? query returns the unit of the specified trace.
+
+        Args:
+            unit (Optional[Unit], optional): Unit to change channel to.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Unit]: Unit the hannel is currently set to.
+        """
+        cmd = f"{self.name}:UNIT"
+        res = self.dispatch_enum(cmd, unit)
+
+        if res is not None:
+            return Unit(res.val)
 
         return None
 
