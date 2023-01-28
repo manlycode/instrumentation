@@ -196,6 +196,11 @@ class ChannelList:
             map(lambda x: Channel(x, resource), numbers)
         )
 
+    def attenuation(
+        self, attn: Optional[Attenuation] = None
+    ) -> list[Optional[Attenuation]]:
+        return list(map(lambda x: x.attenuation(attn), self.channels))
+
     def bandwith_limit(
         self, state: Optional[bool] = None
     ) -> list[Optional[bool]]:

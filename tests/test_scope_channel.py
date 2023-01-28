@@ -21,6 +21,8 @@ def test_channel_attenuation():
     channel.attenuation(Attenuation._1)
     assert channel.attenuation() == Attenuation._1
 
+    assert channels.attenuation() == [Attenuation._1, Attenuation._1]
+
 
 def test_channel_bandwith_limit():
     scope.reset()
