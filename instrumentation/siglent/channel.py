@@ -109,7 +109,7 @@ class Channel(Commandable):
         - [✅] ATTN
         - [✅] BWL
         - [✅] CPL
-        - [ ] OFST
+        - [✅] OFST
         - [ ] SKEW
         - [ ] TRA
         - [ ] UNIT
