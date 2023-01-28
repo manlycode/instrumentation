@@ -64,9 +64,20 @@ def test_channel_coupling():
 
 
 def test_channel_offset():
-    channel.offset(Offset.V(-3))
-    channel.offset(Offset.uV(500))
-    channel.offset(Offset.mV(0))
+    channel.offset(Offset.V(-3.0))
+    result = channel.offset()
+    assert result.value == float(-3.0)
+    assert result.unit == "V"
+
+    channel.offset(Offset.mV(500.0))
+    result = channel.offset()
+    assert result.value == float(0.5)
+    assert result.unit == "V"
+
+    channel.offset(Offset.mV(0.0))
+    result = channel.offset()
+    assert result.value == float(0.0)
+    assert result.unit == "V"
 
 
 def xtest_channels_coupling():

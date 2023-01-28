@@ -1,3 +1,4 @@
+import re
 from enum import Enum, auto
 from typing import Optional
 
@@ -32,7 +33,7 @@ class Coupling(Enum):
 
 
 class Offset:
-    def __init__(self, value: int, unit: str = "V") -> None:
+    def __init__(self, value: float, unit: str = "V") -> None:
         self.value = value
         self.unit = unit
 
@@ -40,16 +41,30 @@ class Offset:
         return f"{self.value}{self.unit}"
 
     @classmethod
-    def V(cls, value: int):
+    def V(cls, value: float):
         return cls(value, "V")
 
     @classmethod
-    def mV(cls, value: int):
+    def mV(cls, value: float):
         return cls(value, "mV")
 
     @classmethod
-    def uV(cls, value: int):
+    def uV(cls, value: float):
         return cls(value, "uV")
+
+    @classmethod
+    def parse(cls, value: str):
+        result = re.match(r"(-*\d+\.\d+E[+|-]\d+)(\D+)", value)
+
+        if result is not None:
+            value = result.group(1)
+            unit = result.group(2)
+
+            if value is not None:
+                if unit is not None:
+                    return Offset(float(value), unit)
+
+        raise RuntimeError("Coudln't parse offset")
 
 
 class Value(Enum):
@@ -197,7 +212,23 @@ class Channel(Commandable):
         else:
             return None
 
-    def offset(self, offset: Optional[Offset]) -> Optional[str]:
+    def offset(self, offset: Optional[Offset] = None) -> Optional[Offset]:
+        """
+        The OFFSET command allows adjustment of the vertical offset of the
+        specified input channel. The maximum ranges depend on the fixed
+        sensitivity setting.
+
+        The OFFSET? query returns the offset value of the specified channel.
+
+        Args:
+            offset (Optional[Offset], optional): Offset of the channel.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Offset]: The offset (in `V`)
+
+        """
         cmdRoot = f"{self.name}:OFST"
 
         if offset is not None:
@@ -206,8 +237,8 @@ class Channel(Commandable):
             return None
 
         else:
-            res = self.query(cmdRoot)
-            return res.val
+            res = self.query(f"{cmdRoot}?")
+            return Offset.parse(res.val)
 
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"
