@@ -5,6 +5,7 @@ from pyvisa.resources.usb import USBInstrument
 
 from instrumentation.siglent.channel import Channel, ChannelList
 from instrumentation.siglent.commandable import Commandable
+from instrumentation.siglent.measure import Measure
 
 
 class ScopeId:
@@ -58,6 +59,7 @@ class Scope(Commandable):
     RESOURCE_ID = "USB0::0xF4EC::0x1012::SDSAHBAQ6R1188::INSTR"
 
     def __init__(self, resource: USBInstrument) -> None:
+        self.measure = Measure(resource)
         super().__init__(resource)
 
     def write(self, msg: str):

@@ -116,7 +116,6 @@ class Channel:
         if volts is not None:
             value = 1000 + int((volts * 100.0))
             cmd = f":w2{self.number+cmdOffset}={value}."
-            print(cmd)
 
         else:
             cmd = f":r2{self.number+cmdOffset}=."
@@ -161,5 +160,4 @@ class AWG:
     def print_all_values(self):
         for x in range(int(100)):
             cmd = f"r{x}=."
-            print(cmd)
             print(self.resource.query(cmd))
