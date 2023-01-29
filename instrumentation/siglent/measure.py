@@ -1,6 +1,7 @@
 from pyvisa.resources.usb import USBInstrument
 
 from instrumentation.siglent.commandable import Commandable
+from instrumentation.siglent.si_value import SIValue
 
 
 class Measure(Commandable):
@@ -16,7 +17,7 @@ class Measure(Commandable):
         Commandable (_type_): _description_
 
     TODO:
-        - [ ] CYMT?
+        - [✅] CYMT?
         - [ ] MEAD
         - [ ] PACU
         - [ ] PAVA?
@@ -31,3 +32,20 @@ class Measure(Commandable):
 
     def __init__(self, resource: USBInstrument) -> None:
         super().__init__(resource)
+
+    def cymometer(self) -> SIValue:
+        """
+        The CYMOMETER? query measures and returns the frequency counter of the
+        specified source. The counter measurement counts the trigger level
+        crossings at the selected trigger slope and displays the results in
+        MHz/kHz/Hz.
+
+        Returns:
+            SIValue:
+                - unit: MHz/kHz/Hz
+                - value: Frequency
+        """
+        cmd = "CYMT?"
+        res = super().query(cmd)
+
+        return SIValue.parse(res.val)
