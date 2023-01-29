@@ -32,7 +32,7 @@ class Coupling(Enum):
     GND = "GND"
 
 
-class Offset(SIValue):
+class Voltage(SIValue):
     @classmethod
     def V(cls, value: float):
         return cls(value, "V")
@@ -103,7 +103,7 @@ class Channel(Commandable):
         - [✅] SKEW
         - [✅] TRA
         - [✅] UNIT
-        - [ ] VDIV
+        - [✅] VDIV
         - [ ] INVS
     """
 
@@ -202,7 +202,7 @@ class Channel(Commandable):
         else:
             return None
 
-    def offset(self, offset: Optional[Offset] = None) -> Optional[Offset]:
+    def offset(self, offset: Optional[Voltage] = None) -> Optional[Voltage]:
         """
         The OFFSET command allows adjustment of the vertical offset of the
         specified input channel. The maximum ranges depend on the fixed
@@ -211,12 +211,12 @@ class Channel(Commandable):
         The OFFSET? query returns the offset value of the specified channel.
 
         Args:
-            offset (Optional[Offset], optional): Offset of the channel.
+            offset (Optional[Voltage], optional): Voltage of the channel.
 
             Defaults to None.
 
         Returns:
-            Optional[Offset]: The offset (in `V`)
+            Optional[Voltage]: The offset (in `V`)
 
         """
         cmdRoot = f"{self.name}:OFST"
@@ -228,7 +228,7 @@ class Channel(Commandable):
 
         else:
             res = self.query(f"{cmdRoot}?")
-            return Offset.parse(res.val)
+            return Voltage.parse(res.val)
 
     def skew(self, ns: Optional[Skew] = None) -> Optional[Skew]:
         """
@@ -308,6 +308,35 @@ class Channel(Commandable):
             return Unit(res.val)
 
         return None
+
+    def volt_div(self, v_gain: Optional[Voltage] = None) -> Optional[Voltage]:
+        """
+        The VOLT_DIV command sets the vertical sensitivity in Volts/div.
+
+        If the probe attenuation is changed, the scale value is multiplied by
+        the probe's attenuation factor.
+
+        The VOLT_DIV? query returns the vertical sensitivity of the specified
+        channel.
+
+        Args:
+            v_gain (Optional[Voltage], optional): Volts/Division.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Voltage]: Volts/Division.
+        """
+        cmdRoot = f"{self.name}:VDIV"
+
+        if v_gain is not None:
+            cmd = f"{cmdRoot} {v_gain}"
+            self.write(cmd)
+            return None
+
+        else:
+            res = self.query(f"{cmdRoot}?")
+            return Voltage.parse(res.val)
 
     def invert(self, inv: Optional[bool] = None):
         cmd = f"{self.name}:INVert"

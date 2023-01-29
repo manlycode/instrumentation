@@ -9,6 +9,12 @@ class SIValue:
     def __str__(self) -> str:
         return f"{self.value}{self.unit}"
 
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, SIValue):
+            return (self.unit == __o.unit) and (self.value == __o.value)
+
+        return False
+
     @classmethod
     def parse(cls, value: str):
         result = re.match(r"(-*\d+\.\d+E[+|-]\d+)(\D+)", value)

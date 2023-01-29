@@ -7,7 +7,7 @@ from tests import awg, scope
 from instrumentation.siglent.channel import (
     Attenuation,
     Coupling,
-    Offset,
+    Voltage,
     Skew,
     Unit,
     Value,
@@ -66,17 +66,17 @@ def test_channel_coupling():
 
 
 def test_channel_offset():
-    channel.offset(Offset.V(-3.0))
+    channel.offset(Voltage.V(-3.0))
     result = channel.offset()
     assert result.value == float(-3.0)
     assert result.unit == "V"
 
-    channel.offset(Offset.mV(500.0))
+    channel.offset(Voltage.mV(500.0))
     result = channel.offset()
     assert result.value == float(0.5)
     assert result.unit == "V"
 
-    channel.offset(Offset.mV(0.0))
+    channel.offset(Voltage.mV(0.0))
     result = channel.offset()
     assert result.value == float(0.0)
     assert result.unit == "V"
@@ -95,11 +95,11 @@ def test_channel_skew():
 
 
 def test_channel_trace():
-    channel.trace(True)
-    assert channel.trace()
-
     channel.trace(False)
     assert channel.trace() is False
+
+    channel.trace(True)
+    assert channel.trace()
 
 
 def test_channel_unit():
@@ -108,6 +108,15 @@ def test_channel_unit():
 
     channel.unit(Unit.V)
     assert channel.unit() == Unit.V
+
+
+def test_channel_volt_div():
+    channel.trace(True)
+    channel.volt_div(Voltage.mV(50))
+    assert channel.volt_div() == Voltage.V(0.05)
+
+    channel.volt_div(Voltage.V(1))
+    assert channel.volt_div() == Voltage.V(1)
 
 
 def xtest_channels_coupling():
