@@ -378,8 +378,24 @@ class ChannelList:
     ) -> list[Optional[Coupling]]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
 
+    def offset(
+        self, offset: Optional[Voltage] = None
+    ) -> list[Optional[Voltage]]:
+        return list(map(lambda x: x.offset(offset), self.channels))
+
+    def skew(self, ns: Optional[Skew] = None) -> list[Optional[Skew]]:
+        return list(map(lambda x: x.skew(ns), self.channels))
+
     def trace(self, state: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.trace(state), self.channels))
+
+    def unit(self, unit: Optional[Unit] = None) -> list[Optional[Unit]]:
+        return list(map(lambda x: x.unit(unit), self.channels))
+
+    def volt_div(
+        self, v_gain: Optional[Voltage] = None
+    ) -> list[Optional[Voltage]]:
+        return list(map(lambda x: x.volt_div(v_gain), self.channels))
 
     def invert(self, inv: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.invert(inv), self.channels))
