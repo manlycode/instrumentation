@@ -95,16 +95,16 @@ class Channel(Commandable):
     Args:
         Commandable (_type_): _description_
 
-    TODO:
-        - [✅] ATTN
-        - [✅] BWL
-        - [✅] CPL
-        - [✅] OFST
-        - [✅] SKEW
-        - [✅] TRA
-        - [✅] UNIT
-        - [✅] VDIV
-        - [✅] INVS
+    Supports the following SYCPI Channel commands (See pg. 40)
+        - ATTN
+        - BWL
+        - CPL
+        - OFST
+        - SKEW
+        - TRA
+        - UNIT
+        - VDIV
+        - INVS
     """
 
     def __init__(self, number: int, resource) -> None:
