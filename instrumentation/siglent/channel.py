@@ -356,27 +356,6 @@ class Channel(Commandable):
         cmd = f"{self.name}:INVS"
         return self.dispatch_bool(cmd, inv)
 
-    def label(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:LABel"
-        flag = Flag.fromBool(state)
-        return self.dispatch_enum(cmd, flag)
-
-    def labelText(self, label: Optional[str] = None):
-        cmd = f"{self.name}:LABel:TEXT"
-        return self.dispatch_quoted_string(cmd, label)
-
-    def visible(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:VIS"
-        return self.dispatch_enum(cmd, Flag.fromBool(state))
-
-    def parameter_value(self, value: Value):
-        cmd = f":C{self.number}:PARAMETER_VALUE? {value.name}"
-        result = self.resource.query(cmd)
-        split_result = str.split(result, ",")[1]
-        print(split_result)
-
-        return self.resource.query(cmd)
-
 
 class ChannelList:
     def __init__(self, resource, numbers: list[int]) -> None:
@@ -404,12 +383,3 @@ class ChannelList:
 
     def invert(self, inv: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.invert(inv), self.channels))
-
-    def label(self, state: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.label(state), self.channels))
-
-    def labelText(self, label: Optional[str] = None) -> list[str]:
-        return list(map(lambda x: x.labelText(label), self.channels))
-
-    def visible(self, vis: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.visible(vis), self.channels))
