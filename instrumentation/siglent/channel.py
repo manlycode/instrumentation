@@ -104,7 +104,7 @@ class Channel(Commandable):
         - [✅] TRA
         - [✅] UNIT
         - [✅] VDIV
-        - [ ] INVS
+        - [✅] INVS
     """
 
     def __init__(self, number: int, resource) -> None:
@@ -278,12 +278,7 @@ class Channel(Commandable):
             Optional[bool]: _description_
         """
         cmd = f"{self.name}:TRA"
-        res = self.dispatch_enum(cmd, Flag.fromBool(state))
-
-        if res is not None:
-            return Flag(res.val).toBool()
-
-        return None
+        return self.dispatch_bool(cmd, state)
 
     def unit(self, unit: Optional[Unit] = None) -> Optional[Unit]:
         """
@@ -338,9 +333,28 @@ class Channel(Commandable):
             res = self.query(f"{cmdRoot}?")
             return Voltage.parse(res.val)
 
-    def invert(self, inv: Optional[bool] = None):
-        cmd = f"{self.name}:INVert"
-        return self.dispatch_enum(cmd, Flag.fromBool(inv))
+    def invert(self, inv: Optional[bool] = None) -> Optional[bool]:
+        """
+        The INVERTSET command mathematically inverts the specified traces or
+        the math waveform.
+
+        The INVERTSET? query returns the current state of the channel
+        inversion.
+
+
+        Args:
+            inv (Optional[bool], optional):
+                - True: Invert the channel.
+                - False: Don't invert the channel.
+                - None: Query invert status
+
+            Defaults to None.
+
+        Returns:
+            Optional[bool]: State of the channel's invert flag.
+        """
+        cmd = f"{self.name}:INVS"
+        return self.dispatch_bool(cmd, inv)
 
     def label(self, state: Optional[bool] = None):
         cmd = f"{self.name}:LABel"
@@ -388,7 +402,7 @@ class ChannelList:
     def trace(self, state: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.trace(state), self.channels))
 
-    def invert(self, inv: Optional[bool] = None) -> list[str]:
+    def invert(self, inv: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.invert(inv), self.channels))
 
     def label(self, state: Optional[bool] = None) -> list[str]:

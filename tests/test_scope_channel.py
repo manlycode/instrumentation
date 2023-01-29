@@ -119,20 +119,20 @@ def test_channel_volt_div():
     assert channel.volt_div() == Voltage.V(1)
 
 
+def test_channel_invert():
+    channel.invert(True)
+    assert channel.invert()
+
+    channel.invert(False)
+    assert channel.invert() is False
+
+
 def xtest_channels_coupling():
     channels.coupling(Coupling.AC)
     assert channels.coupling() == ["AC", "AC"]
 
     channels.coupling(Coupling.DC)
     assert channels.coupling() == ["DC", "DC"]
-
-
-def xtest_channel_invert():
-    channel.invert(True)
-    assert channel.invert() == "ON"
-
-    channel.invert(False)
-    assert channel.invert() == "OFF"
 
 
 def xtest_channels_invert():
