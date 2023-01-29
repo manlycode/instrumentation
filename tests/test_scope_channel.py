@@ -1,14 +1,12 @@
 from time import sleep
-from instrumentation.JDS6600.awg import Freq, WaveForm
 
-import pytest
-
-from tests import awg, scope
+from tests import scope
 from instrumentation.siglent.channel import (
     Attenuation,
     Coupling,
-    Offset,
-    Value,
+    Voltage,
+    Skew,
+    Unit,
 )
 
 channel = scope.channel(1)
@@ -64,106 +62,62 @@ def test_channel_coupling():
 
 
 def test_channel_offset():
-    channel.offset(Offset.V(-3.0))
+    channel.offset(Voltage.V(-3.0))
     result = channel.offset()
     assert result.value == float(-3.0)
     assert result.unit == "V"
 
-    channel.offset(Offset.mV(500.0))
+    channel.offset(Voltage.mV(500.0))
     result = channel.offset()
     assert result.value == float(0.5)
     assert result.unit == "V"
 
-    channel.offset(Offset.mV(0.0))
+    channel.offset(Voltage.mV(0.0))
     result = channel.offset()
     assert result.value == float(0.0)
     assert result.unit == "V"
 
 
-def xtest_channels_coupling():
-    channels.coupling(Coupling.AC)
-    assert channels.coupling() == ["AC", "AC"]
+def test_channel_skew():
+    channel.skew(Skew.nS(-3.0))
+    result = channel.skew()
+    assert result.value == float("-3.0E-09")
+    assert result.unit == "S"
 
-    channels.coupling(Coupling.DC)
-    assert channels.coupling() == ["DC", "DC"]
+    channel.skew(Skew.nS(0))
+    result = channel.skew()
+    assert result.value == float(0.0)
+    assert result.unit == "S"
 
 
-def xtest_channel_invert():
+def test_channel_trace():
+    channel.trace(False)
+    assert channel.trace() is False
+
+    channel.trace(True)
+    assert channel.trace()
+
+
+def test_channel_unit():
+    channel.unit(Unit.A)
+    assert channel.unit() == Unit.A
+
+    channel.unit(Unit.V)
+    assert channel.unit() == Unit.V
+
+
+def test_channel_volt_div():
+    channel.trace(True)
+    channel.volt_div(Voltage.mV(50))
+    assert channel.volt_div() == Voltage.V(0.05)
+
+    channel.volt_div(Voltage.V(1))
+    assert channel.volt_div() == Voltage.V(1)
+
+
+def test_channel_invert():
     channel.invert(True)
-    assert channel.invert() == "ON"
+    assert channel.invert()
 
     channel.invert(False)
-    assert channel.invert() == "OFF"
-
-
-def xtest_channels_invert():
-    channels.invert(True)
-    assert channels.invert() == ["ON", "ON"]
-
-    channels.invert(False)
-    assert channels.invert() == ["OFF", "OFF"]
-
-
-def xtest_channel_label():
-    pytest.skip(reason="This doesn't seem to work")
-    channel.label(True)
-    assert channel.label() == "OFF"
-
-    channel.label(True)
-    assert channel.label() == "ON"
-
-
-def xtest_channels_label():
-    pytest.skip(reason="This doesn't seem to work")
-    channels.label(True)
-    assert channels.label() == ["ON", "ON"]
-
-    channels.label(False)
-    assert channels.label() == ["OFF", "OFF"]
-
-
-def xtest_channel_labelText():
-    channel.labelText("A")
-    assert channel.labelText() == "A"
-
-    channel.labelText("B")
-    assert channel.labelText() == "B"
-
-
-def xtest_channels_labelText():
-    channels.labelText("A")
-    assert channels.labelText() == ["A", "A"]
-
-    channels.labelText("B")
-    assert channels.labelText() == ["B", "B"]
-
-
-def xtest_channel_visible():
-    channel.visible(True)
-    assert channel.visible() == "ON"
-
-    channel.visible(False)
-    assert channel.visible() == "OFF"
-
-
-def xtest_channels_visible():
-    channels.visible(True)
-    assert channels.visible() == ["ON", "ON"]
-
-    channels.visible(False)
-    assert channels.visible() == ["OFF", "OFF"]
-
-
-def xtest_channel_parameter_value():
-    awg.channel(1).waveForm(WaveForm.SINE)
-    awg.channel(1).frequency(Freq.Hz(100))
-    awg.channel(1).offset(0.0)
-    awg.channel(1).amplitude(1.0)
-
-    scope.channel(1).switch(True)
-    scope.auto_setup()
-
-    sleep(2)
-    print(channel.parameter_value(Value.PKPK))
-    print(channel.parameter_value(Value.AMPL))
-    print(channel.parameter_value(Value.FREQ))
+    assert channel.invert() is False

@@ -42,6 +42,18 @@ class Commandable:
         else:
             return self.__dispatch_string(cmdRoot, arg.value)
 
+    def dispatch_bool(
+        self,
+        cmd: str,
+        state: Optional[bool] = None,
+    ) -> Optional[bool]:
+        res = self.dispatch_enum(cmd, Flag.fromBool(state))
+
+        if res is not None:
+            return Flag(res.val).toBool()
+
+        return None
+
     def dispatch_quoted_string(self, cmdRoot: str, arg):
         if arg is None:
             cmd = f"{cmdRoot}?"
@@ -63,6 +75,7 @@ class Commandable:
         if arg is None:
             cmd = f"{cmdRoot}?"
             res = self.resource.query(cmd)
+
             return Response(res)
 
         else:

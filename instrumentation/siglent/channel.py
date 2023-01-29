@@ -32,7 +32,7 @@ class Coupling(Enum):
     GND = "GND"
 
 
-class Offset(SIValue):
+class Voltage(SIValue):
     @classmethod
     def V(cls, value: float):
         return cls(value, "V")
@@ -44,6 +44,17 @@ class Offset(SIValue):
     @classmethod
     def uV(cls, value: float):
         return cls(value, "uV")
+
+
+class Skew(SIValue):
+    @classmethod
+    def nS(cls, value: float):
+        return cls(value, "NS")
+
+
+class Unit(Enum):
+    V = "V"
+    A = "A"
 
 
 class Value(Enum):
@@ -84,16 +95,16 @@ class Channel(Commandable):
     Args:
         Commandable (_type_): _description_
 
-    TODO:
-        - [✅] ATTN
-        - [✅] BWL
-        - [✅] CPL
-        - [✅] OFST
-        - [ ] SKEW
-        - [ ] TRA
-        - [ ] UNIT
-        - [ ] VDIV
-        - [ ] INVS
+    Supports the following SYCPI Channel commands (See pg. 40)
+        - ATTN
+        - BWL
+        - CPL
+        - OFST
+        - SKEW
+        - TRA
+        - UNIT
+        - VDIV
+        - INVS
     """
 
     def __init__(self, number: int, resource) -> None:
@@ -191,7 +202,7 @@ class Channel(Commandable):
         else:
             return None
 
-    def offset(self, offset: Optional[Offset] = None) -> Optional[Offset]:
+    def offset(self, offset: Optional[Voltage] = None) -> Optional[Voltage]:
         """
         The OFFSET command allows adjustment of the vertical offset of the
         specified input channel. The maximum ranges depend on the fixed
@@ -200,12 +211,12 @@ class Channel(Commandable):
         The OFFSET? query returns the offset value of the specified channel.
 
         Args:
-            offset (Optional[Offset], optional): Offset of the channel.
+            offset (Optional[Voltage], optional): Voltage of the channel.
 
             Defaults to None.
 
         Returns:
-            Optional[Offset]: The offset (in `V`)
+            Optional[Voltage]: The offset (in `V`)
 
         """
         cmdRoot = f"{self.name}:OFST"
@@ -217,36 +228,133 @@ class Channel(Commandable):
 
         else:
             res = self.query(f"{cmdRoot}?")
-            return Offset.parse(res.val)
+            return Voltage.parse(res.val)
 
-    def invert(self, inv: Optional[bool] = None):
-        cmd = f"{self.name}:INVert"
-        return self.dispatch_enum(cmd, Flag.fromBool(inv))
+    def skew(self, ns: Optional[Skew] = None) -> Optional[Skew]:
+        """
+        The SKEW command sets the channel-to-channel skew factor for the
+        specified channel. Each analog channel can be adjusted + or -100 ns for
+        a total of 200 ns difference between channels. You can use the
+        oscilloscope's skew control to remove cable-delay errors between
+        channels.
 
-    def label(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:LABel"
-        flag = Flag.fromBool(state)
-        return self.dispatch_enum(cmd, flag)
+        The SKEW? query returns the skew value of the specified trace.
 
-    def labelText(self, label: Optional[str] = None):
-        cmd = f"{self.name}:LABel:TEXT"
-        return self.dispatch_quoted_string(cmd, label)
+        Args:
+            ns (Optional[Skew], optional): Duration to skew channel.
 
-    def visible(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:VIS"
-        return self.dispatch_enum(cmd, Flag.fromBool(state))
+            Defaults to None.
 
-    def switch(self, state: Optional[bool] = None):
-        cmd = f"{self.name}:SWITch"
-        return self.dispatch_enum(cmd, Flag.fromBool(state))
+        Returns:
+            Optional[Skew]: _description_
+        """
+        cmdRoot = f"{self.name}:SKEW"
 
-    def parameter_value(self, value: Value):
-        cmd = f":C{self.number}:PARAMETER_VALUE? {value.name}"
-        result = self.resource.query(cmd)
-        split_result = str.split(result, ",")[1]
-        print(split_result)
+        if ns is not None:
+            cmd = f"{cmdRoot} {ns}"
+            self.write(cmd)
+            return None
 
-        return self.resource.query(cmd)
+        else:
+            res = self.query(f"{cmdRoot}?")
+            return Skew.parse(res.val)
+
+    def trace(self, state: Optional[bool] = None) -> Optional[bool]:
+        """
+        The TRACE command turns the display of the specified channel on or off.
+
+        The TRACE? query returns the current display setting for the specified
+        channel.
+
+        Args:
+            state (Optional[bool], optional):
+                - `True` turns the channelon.
+                - `False` turns the cnannel off.
+                - `None` returns the state of the channel.
+
+            Defaults to None.
+
+        Returns:
+            Optional[bool]: _description_
+        """
+        cmd = f"{self.name}:TRA"
+        return self.dispatch_bool(cmd, state)
+
+    def unit(self, unit: Optional[Unit] = None) -> Optional[Unit]:
+        """
+        The UNIT command sets the unit of the specified trace. Measurement
+        results, channel sensitivity, and trigger level will reflect the
+        measurement units you select.
+
+        The UNIT? query returns the unit of the specified trace.
+
+        Args:
+            unit (Optional[Unit], optional): Unit to change channel to.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Unit]: Unit the hannel is currently set to.
+        """
+        cmd = f"{self.name}:UNIT"
+        res = self.dispatch_enum(cmd, unit)
+
+        if res is not None:
+            return Unit(res.val)
+
+        return None
+
+    def volt_div(self, v_gain: Optional[Voltage] = None) -> Optional[Voltage]:
+        """
+        The VOLT_DIV command sets the vertical sensitivity in Volts/div.
+
+        If the probe attenuation is changed, the scale value is multiplied by
+        the probe's attenuation factor.
+
+        The VOLT_DIV? query returns the vertical sensitivity of the specified
+        channel.
+
+        Args:
+            v_gain (Optional[Voltage], optional): Volts/Division.
+
+            Defaults to None.
+
+        Returns:
+            Optional[Voltage]: Volts/Division.
+        """
+        cmdRoot = f"{self.name}:VDIV"
+
+        if v_gain is not None:
+            cmd = f"{cmdRoot} {v_gain}"
+            self.write(cmd)
+            return None
+
+        else:
+            res = self.query(f"{cmdRoot}?")
+            return Voltage.parse(res.val)
+
+    def invert(self, inv: Optional[bool] = None) -> Optional[bool]:
+        """
+        The INVERTSET command mathematically inverts the specified traces or
+        the math waveform.
+
+        The INVERTSET? query returns the current state of the channel
+        inversion.
+
+
+        Args:
+            inv (Optional[bool], optional):
+                - True: Invert the channel.
+                - False: Don't invert the channel.
+                - None: Query invert status
+
+            Defaults to None.
+
+        Returns:
+            Optional[bool]: State of the channel's invert flag.
+        """
+        cmd = f"{self.name}:INVS"
+        return self.dispatch_bool(cmd, inv)
 
 
 class ChannelList:
@@ -270,17 +378,24 @@ class ChannelList:
     ) -> list[Optional[Coupling]]:
         return list(map(lambda x: x.coupling(cpl), self.channels))
 
-    def invert(self, inv: Optional[bool] = None) -> list[str]:
+    def offset(
+        self, offset: Optional[Voltage] = None
+    ) -> list[Optional[Voltage]]:
+        return list(map(lambda x: x.offset(offset), self.channels))
+
+    def skew(self, ns: Optional[Skew] = None) -> list[Optional[Skew]]:
+        return list(map(lambda x: x.skew(ns), self.channels))
+
+    def trace(self, state: Optional[bool] = None) -> list[Optional[bool]]:
+        return list(map(lambda x: x.trace(state), self.channels))
+
+    def unit(self, unit: Optional[Unit] = None) -> list[Optional[Unit]]:
+        return list(map(lambda x: x.unit(unit), self.channels))
+
+    def volt_div(
+        self, v_gain: Optional[Voltage] = None
+    ) -> list[Optional[Voltage]]:
+        return list(map(lambda x: x.volt_div(v_gain), self.channels))
+
+    def invert(self, inv: Optional[bool] = None) -> list[Optional[bool]]:
         return list(map(lambda x: x.invert(inv), self.channels))
-
-    def label(self, state: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.label(state), self.channels))
-
-    def labelText(self, label: Optional[str] = None) -> list[str]:
-        return list(map(lambda x: x.labelText(label), self.channels))
-
-    def visible(self, vis: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.visible(vis), self.channels))
-
-    def switch(self, state: Optional[bool] = None) -> list[str]:
-        return list(map(lambda x: x.switch(state), self.channels))
