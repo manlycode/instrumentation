@@ -1,3 +1,4 @@
+from time import sleep
 from instrumentation.JDS6600.awg import Freq, WaveForm
 from tests import scope, awg
 
@@ -12,7 +13,9 @@ def setup_awg():
 
 def test_measure_cymometer():
     setup_awg()
+    scope.reset()
     scope.auto_setup()
+    sleep(5)
     result = scope.measure.cymometer()
     assert result.unit == "Hz"
     assert result.value > 99.0
