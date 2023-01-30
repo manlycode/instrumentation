@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from pyvisa.resources.usb import USBInstrument
 
 from instrumentation.siglent.commandable import Commandable

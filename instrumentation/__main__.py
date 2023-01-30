@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Entry point for instrumentation."""
 
 from .cli import main  # pragma: no covers

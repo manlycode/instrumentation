@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from instrumentation.siglent.scope import ScopeId
 from tests import scope
 

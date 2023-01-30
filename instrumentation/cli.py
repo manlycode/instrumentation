@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """CLI interface for instrumentation project.
 
 Be creative! do whatever you want!

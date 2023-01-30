@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from instrumentation.base import NAME
 from tests import awg, scope
 

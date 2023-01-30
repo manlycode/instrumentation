@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from enum import IntEnum
 from typing import Optional
 
@@ -59,7 +61,8 @@ class Channel:
         self.resource = resource
 
     def __dispatch(self, cmd: str) -> Optional[str]:
-        result = self.resource.query(f"{cmd}\r\n")
+        # result = self.resource.query(f"{cmd}\r\n")
+        result = self.resource.query(f"{cmd}")
 
         if isinstance(result, str):
             return result.strip()
@@ -136,6 +139,12 @@ class ChannelList:
 
     def frequency(self, limit: Optional[Freq] = None) -> list[Optional[str]]:
         return list(map(lambda x: x.frequency(limit), self.channels))
+
+    def offset(self, offset: Optional[float] = None) -> list[Optional[str]]:
+        return list(map(lambda x: x.offset(offset), self.channels))
+
+    def amplitude(self, volts: Optional[float] = None) -> list[Optional[str]]:
+        return list(map(lambda x: x.amplitude(volts), self.channels))
 
 
 class AWG:

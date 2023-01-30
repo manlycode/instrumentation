@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .channel import Coupling
 from .scope import Commandable, HeaderMode, Scope
 

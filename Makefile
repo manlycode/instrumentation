@@ -47,6 +47,10 @@ test: lint        ## Run tests and generate coverage report.
 watch:            ## Run tests on every change.
 	ls **/**.py | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_measure.py
 
+.PHONY: watch-fmt
+watch-fmt:            ## Run tests on every change.
+	ls **/**.py | entr make fmt
+
 .PHONY: clean
 clean:            ## Clean unused files.
 	@find ./ -name '*.pyc' -exec rm -f {} \;

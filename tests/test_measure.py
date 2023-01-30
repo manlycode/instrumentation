@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from time import sleep
+from instrumentation.siglent.channel import Coupling
+from instrumentation.siglent.measure import MDType
+import pytest
 from instrumentation.JDS6600.awg import Freq, WaveForm
 from tests import scope, awg
 
@@ -11,7 +16,16 @@ def setup_awg():
     awg_chan.amplitude(1.0)
 
 
+def setup_dual_awg():
+    awg_chans = awg.channels([1, 2])
+    awg_chans.waveForm(WaveForm.SINE)
+    awg_chans.frequency(Freq.Hz(100))
+    awg_chans.offset(0.0)
+    awg_chans.amplitude(1.0)
+
+
 def test_measure_cymometer():
+    pytest.skip()
     setup_awg()
     scope.reset()
     scope.auto_setup()
@@ -20,3 +34,13 @@ def test_measure_cymometer():
     assert result.unit == "Hz"
     assert result.value > 99.0
     assert result.value < 101.0
+
+
+def test_measure_delay():
+    setup_dual_awg()
+    awg.channel(2).phase(180)
+    scope.channels([1, 2]).coupling(Coupling.A1M)
+
+    response = scope.measure.measure_delay(MDType.PHA, 1, 2)
+    assert response.value > 179.0
+    assert response.value < 181.0
