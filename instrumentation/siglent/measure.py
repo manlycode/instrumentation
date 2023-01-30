@@ -132,8 +132,10 @@ class Measure(Commandable):
         """
         source = f"C{src_a}-C{src_b}"
         cmd = f"{source}:MEAD? {type.value}"
+        self.resource.write("CHDR LONG")
         self.resource.write(cmd)
 
-        result = self.resource.read(encoding="latin_1")
+        result = self.resource.read(encoding="mac_latin2")
+
         value_unit = result.split(" ")[1].split(",")[1]
         return SIValue.parse(value_unit)

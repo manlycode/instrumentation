@@ -45,7 +45,7 @@ test: lint        ## Run tests and generate coverage report.
 
 .PHONY: watch
 watch:            ## Run tests on every change.
-	ls **/**.py | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_measure.py
+	ls **/**.py | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_awg.py
 
 .PHONY: watch-fmt
 watch-fmt:            ## Run tests on every change.

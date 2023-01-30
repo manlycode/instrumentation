@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum
+from time import sleep
 from typing import Optional
 
 from pyvisa.resources.usb import USBInstrument
@@ -53,6 +54,18 @@ class Freq:
     @staticmethod
     def uHz(val: float):
         return Freq(int(val * 100), 4)
+
+
+class ChanEnabled:
+    def __init__(self, value: bool) -> None:
+        self.value = value
+
+    def __str__(self) -> str:
+        if self.value:
+            return "1"
+
+        else:
+            return "0"
 
 
 class Channel:
@@ -165,6 +178,24 @@ class AWG:
 
     def channels(self, numbers: list[int]) -> ChannelList:
         return ChannelList(self.resource, numbers)
+
+    def enable_channels(
+        self, c1_on: Optional[bool] = None, c2_on: Optional[bool] = None
+    ):
+        if (c1_on is not None) and (c2_on is not None):
+            cmd = f":w20={ChanEnabled(c1_on)},{ChanEnabled(c2_on)}."
+            self.resource.query(cmd)
+
+            return None
+        else:
+            cmd = ":r20=."
+            res = self.resource.query(cmd)
+            str_values = res.split("=")[1].rstrip().replace(".", "").split(",")
+            values = list(
+                map(lambda x: x == "1", str_values)
+                )
+
+            return values
 
     def print_all_values(self):
         for x in range(int(100)):
