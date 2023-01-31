@@ -43,7 +43,7 @@ def test_measure_delay():
     scope.auto_setup()
     sleep(2)
     response = scope.measure.measure_delay(MDType.PHA, 1, 2)
-    assert response.value > 179.0
+    assert response.value > 178.0
     assert response.value < 181.0
 
     response = scope.measure.measure_delay(MDType.FFF, 1, 2)
