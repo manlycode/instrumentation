@@ -12,6 +12,22 @@ def test_awg_freq_hz():
     assert multiple[0] == Freq.Hz(100)
     assert multiple[0] == Freq.Hz(100)
 
+    multiple = Freq.kHz(100, 200)
+    assert multiple[0] == Freq.kHz(100)
+    assert multiple[0] == Freq.kHz(100)
+
+    multiple = Freq.MHz(100, 200)
+    assert multiple[0] == Freq.MHz(100)
+    assert multiple[0] == Freq.MHz(100)
+
+    multiple = Freq.mHz(100, 200)
+    assert multiple[0] == Freq.mHz(100)
+    assert multiple[0] == Freq.mHz(100)
+
+    multiple = Freq.uHz(100, 200)
+    assert multiple[0] == Freq.uHz(100)
+    assert multiple[0] == Freq.uHz(100)
+
 
 def test_awg_enable():
     awg.enable_channels(True, True)

@@ -41,8 +41,12 @@ class Freq:
         )
 
     @staticmethod
-    def Hz(*values: float):
-        results = list(map(lambda x: Freq(int(x) * 100, 0), values))
+    def _Hz(val: float):
+        return Freq(int(val * 100), 0)
+
+    @staticmethod
+    def _listOf(funcRef, values):
+        results = list(map(funcRef, values))
 
         if len(results) <= 1:
             return results[0]
@@ -51,20 +55,40 @@ class Freq:
             return results
 
     @staticmethod
-    def kHz(val: float):
+    def Hz(*values: float):
+        return Freq._listOf(Freq._Hz, values)
+
+    @staticmethod
+    def _kHz(val: float):
         return Freq(int(val * 10000), 1)
 
     @staticmethod
-    def MHz(val: float):
+    def kHz(*values: float):
+        return Freq._listOf(Freq._kHz, values)
+
+    @staticmethod
+    def _MHz(val: float):
         return Freq(int(val * 100000000), 2)
 
     @staticmethod
-    def mHz(val: float):
+    def MHz(*values: float):
+        return Freq._listOf(Freq._MHz, values)
+
+    @staticmethod
+    def _mHz(val: float):
         return Freq(int(val * 100), 3)
 
     @staticmethod
-    def uHz(val: float):
+    def mHz(*values: float):
+        return Freq._listOf(Freq._mHz, values)
+
+    @staticmethod
+    def _uHz(val: float):
         return Freq(int(val * 100), 4)
+
+    @staticmethod
+    def uHz(*values: float):
+        return Freq._listOf(Freq._uHz, values)
 
 
 class ChanEnabled:
