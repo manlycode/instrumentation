@@ -7,10 +7,21 @@ from instrumentation.JDS6600.awg import Freq
 from ..JDS6600 import AWG, WaveForm
 from ..siglent import Coupling, Scope
 
+rm = pyvisa.ResourceManager()
+
+
+def build_awg() -> AWG:
+    res = rm.open_resource(AWG.RESOURCE_ID)
+    res.baud_rate = AWG.BAUD_RATE  # type: ignore
+    return AWG(res)  # type: ignore
+
+
+def build_scope() -> Scope:
+    res = rm.open_resource(Scope.RESOURCE_ID)
+    return Scope(res)  # type: ignore
+
 
 def runScript():
-    rm = pyvisa.ResourceManager()
-    print(rm.list_resources())
 
     scope_resource = rm.open_resource(Scope.RESOURCE_ID)
     scope = Scope(scope_resource)

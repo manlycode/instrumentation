@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
-from time import sleep
+from instrumentation.JDS6600.awg import Freq
 from tests import awg
+
+
+def test_awg_freq_hz():
+    single = Freq.Hz(100)
+    assert single.value == 10000
+    assert single.scale == 0
+
+    multiple = Freq.Hz(100, 200)
+    assert multiple[0] == Freq.Hz(100)
+    assert multiple[0] == Freq.Hz(100)
 
 
 def test_awg_enable():

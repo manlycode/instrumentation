@@ -38,9 +38,11 @@ def test_measure_cymometer():
 
 def test_measure_delay():
     setup_dual_awg()
+    awg.enable_channels(True, True)
     awg.channel(2).phase(180)
     scope.channels([1, 2]).coupling(Coupling.A1M)
-
+    scope.auto_setup()
+    sleep(2)
     response = scope.measure.measure_delay(MDType.PHA, 1, 2)
     assert response.value > 179.0
     assert response.value < 181.0

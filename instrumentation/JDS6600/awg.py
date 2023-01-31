@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum
-from time import sleep
 from typing import Optional
 
 from pyvisa.resources.usb import USBInstrument
@@ -35,9 +34,21 @@ class Freq:
     def __str__(self):
         return f"{self.value},{self.scale}"
 
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, type(self)) and (self.value, self.scale) == (
+            __o.value,
+            __o.scale,
+        )
+
     @staticmethod
-    def Hz(val: float):
-        return Freq(int(val * 100), 0)
+    def Hz(*values: float):
+        results = list(map(lambda x: Freq(int(x) * 100, 0), values))
+
+        if len(results) <= 1:
+            return results[0]
+
+        else:
+            return results
 
     @staticmethod
     def kHz(val: float):
@@ -191,9 +202,7 @@ class AWG:
             cmd = ":r20=."
             res = self.resource.query(cmd)
             str_values = res.split("=")[1].rstrip().replace(".", "").split(",")
-            values = list(
-                map(lambda x: x == "1", str_values)
-                )
+            values = list(map(lambda x: x == "1", str_values))
 
             return values
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 from enum import Enum
 from typing import Optional
 
@@ -84,6 +85,7 @@ class Scope(Commandable):
 
     def auto_setup(self):
         super().write("ASET")
+        time.sleep(4)
 
     def idn(self) -> ScopeId:
         """
