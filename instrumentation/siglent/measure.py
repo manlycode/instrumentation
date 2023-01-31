@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum, auto
+from time import sleep
 
 from pyvisa.resources.usb import USBInstrument
 
@@ -140,6 +141,7 @@ class Measure(Commandable):
                 - value: Frequency
         """
         cmd = "CYMT?"
+        self.resource.write("CHDR LONG")
         res = super().query(cmd)
 
         return SIValue.parse(res.val)
@@ -166,8 +168,8 @@ class Measure(Commandable):
         self.resource.write(cmd)
 
         result = self.resource.read(encoding="mac_latin2")
-
         value_unit = result.rstrip().split(" ")[1].split(",")[1]
+
         return SIValue.parse(value_unit)
 
     def parameter_value(self, param_val: ParamValue, src: int) -> SIValue:

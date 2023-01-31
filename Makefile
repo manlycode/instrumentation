@@ -49,7 +49,7 @@ watch:            ## Run tests on every change.
 	find . -name '*.py' | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_scope_measure.py
 .PHONY: watch-fmt
 watch-fmt:            ## Run tests on every change.
-	ls -1 **/**.py | entr make fmt
+	find . -name '*.py' | entr make fmt
 
 .PHONY: clean
 clean:            ## Clean unused files.
