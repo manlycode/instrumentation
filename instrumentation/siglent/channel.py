@@ -59,33 +59,6 @@ class Unit(Enum):
     A = "A"
 
 
-class Value(Enum):
-    PKPK = auto()
-    MAX = auto()
-    MIN = auto()
-    AMPL = auto()
-    TOP = auto()
-    BASE = auto()
-    CMEAN = auto()
-    MEAN = auto()
-    RMS = auto()
-    CRMS = auto()
-    OVSN = auto()
-    FPRE = auto()
-    OVSP = auto()
-    RPRE = auto()
-    PER = auto()
-    FREQ = auto()
-    PWID = auto()
-    NWID = auto()
-    RISE = auto()
-    FALL = auto()
-    WID = auto()
-    DUTY = auto()
-    NDUTY = auto()
-    ALL = auto()
-
-
 class Channel(Commandable):
     """
     The CHANNEL subsystem commands control the analog channels. Channels

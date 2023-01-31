@@ -45,11 +45,11 @@ test: lint        ## Run tests and generate coverage report.
 
 .PHONY: watch
 watch:            ## Run tests on every change.
-	ls **/**.py | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_awg.py
-
+	# ls -1 **/**.py | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_scope_measure.py
+	find . -name '*.py' | entr $(ENV_PREFIX)pytest -s -vvv -l --tb=long --maxfail=1 tests/test_scope_measure.py
 .PHONY: watch-fmt
 watch-fmt:            ## Run tests on every change.
-	ls **/**.py | entr make fmt
+	ls -1 **/**.py | entr make fmt
 
 .PHONY: clean
 clean:            ## Clean unused files.
