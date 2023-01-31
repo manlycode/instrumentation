@@ -3,7 +3,6 @@ from time import sleep
 import pyvisa
 
 from instrumentation.JDS6600.awg import Freq
-from instrumentation.siglent.channel import Attenuation
 from instrumentation.siglent.measure import MDType, ParamValue
 from instrumentation.siglent.si_value import SIValue
 
@@ -98,5 +97,5 @@ def runScript():
     for freq in freqs_to_test:
         result = run_step(freq)
         print(
-            f"{result[0].value}{result[0].unit} {result[1].value} {result[2].value} {result[3].value}"
+            f"{result[0].value}{result[0].unit} {result[1].value} {result[2].value} {result[3].value}"  # type: ignore
         )

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum, auto
+from enum import Enum
 from typing import Optional
 
 from instrumentation.siglent.commandable import Commandable, Flag

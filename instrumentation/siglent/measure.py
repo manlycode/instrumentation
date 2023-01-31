@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from enum import Enum, auto
-from time import sleep
 
 from pyvisa.resources.usb import USBInstrument
 
